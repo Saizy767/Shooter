@@ -1,0 +1,20 @@
+.Category{
+    position: relative;
+    padding-left: 40px;
+    width: 100%;
+    font-size: 26px;
+    justify-content: center;
+    &_arrow{
+        position: relative;
+        z-index: 2;
+        float: right;
+        margin-left: auto;
+        margin-right: 40px;
+        cursor: pointer;
+    }
+    &_name{
+        position: relative;
+        float: left;
+        display: contents;
+    }
+}

@@ -1,0 +1,97 @@
+.Navbar{
+    position: fixed;
+    width: 100%;
+    height: 72px;
+    background-color: #ebb68b;
+    display: flex;
+    z-index: 100;
+    &_items{
+        width: 100%;
+        margin: 0 12%;
+        @media screen and (max-width:1750px) {
+            margin: 0 10%;
+        }
+        @media screen and (max-width:950px) {
+            margin: 0 8%;
+        }
+        @media screen and (max-width:475px) {
+            margin: 0 5%;
+        }
+        @media screen and (max-width:320px) {
+            margin: 0 3%;
+        }
+    }
+    &_logo{
+        position: absolute;
+        cursor: pointer;
+        top: 50%;
+        transform: translateY(-50%);
+        @media screen and (max-width: 1350px) {
+            width: 150px;
+        }
+        @media screen and (max-width: 950px) {
+            width: 125px;
+        } 
+        @media screen and (max-width: 750px) {
+            width: 200px;
+        }
+        @media screen and (max-width: 375px) {
+            width: 175px;
+        }
+        @media screen and (max-width: 320px) {
+            width: 150px;
+        }
+    }
+    &_icon{
+        position: relative;
+        float: right;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+    }
+    &_search{
+        @extend .Navbar_icon;
+        width: 42px;
+        height: 42px;
+        margin-right: 5%;
+        @media screen and (max-width:1350px) {
+            width: 38px;
+            height: 38px;
+        }
+        @media screen and (max-width:950px) {
+            width: 34px;
+            height: 34px;
+        }
+        @media screen and (max-width: 750px) {
+            display: none;
+            visibility: hidden;
+        }
+    }
+    &_user{
+        @extend .Navbar_icon;
+        width: 46px;
+        height: 46px;
+        @media screen and (max-width:1350px) {
+            width: 40px;
+            height: 40px;
+        }
+        @media screen and (max-width:950px) {
+            width: 36px;
+            height: 36px;
+        }
+        @media screen and (max-width: 750px) {
+            display: none;
+            visibility: hidden;
+        }
+    }
+    &_in{
+        @extend .Navbar;
+        top: -80px;
+        transition: 0.5s ease-in;
+    }
+    &_out{
+        @extend .Navbar;
+        top: 0px;
+        transition: 0.5s ease-in;
+    }
+}

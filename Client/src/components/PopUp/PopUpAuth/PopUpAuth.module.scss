@@ -1,0 +1,21 @@
+.PopUpAuth{
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    width: 400px;
+    height: 500px;
+    background-color: white;
+    z-index: 1000;
+    border: black solid 4px;
+    border-radius: 10px;
+    &_header{
+        position: relative;
+        font-size: 32px;
+        text-align: center;
+        margin-top: 40px;
+        font-weight: 600;
+    }
+}

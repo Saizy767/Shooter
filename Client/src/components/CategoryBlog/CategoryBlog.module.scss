@@ -1,0 +1,88 @@
+.Content{
+    position: relative;
+    display: flex;
+    width: 60%;
+    max-width: 700px;
+    height: 250px;
+    margin-bottom: 20px;
+    @media screen and (min-width:1850px) {
+        width: 100%;;
+    }
+    &_image{
+        position: relative;
+        min-width: 250px;
+        height: 100%;
+        background-color: rgb(128, 128, 128);
+    }
+    &_description{
+        position: relative;
+        width: 100%;
+        height: 100%;
+        padding: 20px 40px;
+        border: black solid 3px;
+        border-left:none ;
+    }
+    &_typeCocteil{
+        position: absolute;
+        width: 80px;
+        height: 80px;
+        background-color: rgb(115, 214, 218);
+        top: 20px;
+        right: 20px;
+    }
+    &_header{
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+    &_label{
+        position: relative;
+        font-size: 35px;
+        color: rgb(0, 0, 0);
+        font-weight: 300;
+        flex: 1;
+    }
+    &_author{
+        position: relative;
+    }
+}
+.Emotion{
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    margin-top: 15%;
+    &_ceil{
+        margin: 0px 10px;
+        display: flex;
+    }
+    &_author{
+        position: relative;
+        font-size: 18px;
+        font-weight: 200;
+    }
+    &_result{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+    &_favorite{
+        flex: 20;
+    }
+    &_button{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        width: 180px;
+        height: 30px;
+        gap: 10px;
+    }
+    &_icon{
+        height: 16px;
+        width: auto;
+        margin: 0px 2px;
+    }
+    &_count{
+        font-size: 14px;
+    }
+}

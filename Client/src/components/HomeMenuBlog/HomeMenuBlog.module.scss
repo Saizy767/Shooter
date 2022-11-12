@@ -1,0 +1,116 @@
+.CategoryBlog{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    grid-gap: 0.5rem;
+    color: rgb(168, 168, 168);
+    margin-bottom: 12%;
+    z-index: 1;
+    &_table{
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(auto-fill,200px);
+        grid-gap: 61px;
+        justify-content: center;
+        margin: 2% 0%;
+        width: 100%;
+        overflow: hidden;
+        @media screen and (min-width:1475px){
+            grid-template-columns: repeat(4,200px);
+        }
+        
+    }
+    &_title{
+        font-weight: 700;
+        font-size: 32px;
+        text-transform: uppercase;
+        text-align: center;
+        position: relative;
+        margin-bottom: 35px;
+        color: #000;
+        cursor: default;
+        &::before{
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            margin: auto;
+            background-color: #000;
+            height: 3px;
+            width: 100%;
+        }
+    }
+    &_name{
+        position: relative;
+        background-color: white;
+        z-index: 2;
+        padding: 0 1%;
+    }
+    &_open{
+        height: 1075px;
+        transition: all 0.5s ease-out;
+        @media screen and (max-width:1290px){
+            height:1070px;
+        }
+        @media screen and (max-width:548px) {
+            height:2195px
+        }
+    }
+    &_close{
+        height: 500px;
+        transition: all 0.5s ease-out;
+        @media screen and (max-width:768px) {
+            height: 790px;
+        }
+    }
+    &_more{
+        position: relative;
+        display: flex;
+        justify-content: center;
+        &_link{
+            font-weight: 400;
+            font-size: 20px;
+            text-transform: uppercase;
+            position: relative;
+            margin-bottom: 15px;
+            color: black;
+        }
+    }
+}
+.underline{
+    position: relative;
+    color: #000000;
+  &:after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 3px;
+    border-radius: 10px;
+    bottom: 0;
+    left: 0;
+    background-color: #f38f55;
+    transition: transform 0.25s ease-out;
+    transform-origin: bottom right;
+  }
+  &:hover:after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+  }
+}
+.Arrow{
+    position: relative;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    &_icon{
+        width: 40px;
+        height: auto;
+        color: black;
+        cursor: pointer;
+    }
+    &_open{
+        transform: rotate(180deg);
+    }
+}

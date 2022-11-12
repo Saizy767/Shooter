@@ -1,0 +1,86 @@
+.Recipe{
+    position: relative;
+    margin-top: 20px;
+    font-size: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+    &_main{
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+    &_arrow{
+        height: 25px;
+        width: auto;
+        cursor: pointer;
+        margin-left: 15px;
+    }
+    &_block{
+        position: absolute;
+        z-index: 10;
+        height: 100%;
+        min-height: 250px;
+        width: 100%;
+        margin-top: 10%;
+        background-color: rgb(146, 146, 146);
+    }
+    &_header{
+        position: relative;
+        width: 100%;
+        height: 30%;
+    }
+    &_button{
+        position: relative;
+        border: none;
+        width: 20%;
+        background-color: #ebb68b;
+        color: rgb(255, 255, 255);
+        font-size: 20px;
+        margin: 0px 5px;
+        cursor: pointer;
+    }
+    &_counter{
+        position: relative;
+        font-size: 20px;
+        margin: 0 8px;
+    }
+    &_countBlock{
+        position: absolute;
+        width: 100px;
+        height: 35px;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        bottom: 0px;
+        right: 50px;
+        border: 1px solid black;
+        background-color: #ebb68b;
+        border-radius: 10px;
+    }
+    &_body{
+        position: relative;
+        width: 100%;
+        height: 70%;
+        padding: 20px 40px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    &_row{
+        display: flex;
+    }
+    &_ingedient{
+        margin-left: 0px;
+    }
+    &_gramm{
+        margin-right: 0px;
+    }
+    &_line{
+        flex-grow: 1;
+        border-bottom: 1.6px solid rgb(199, 199, 199);
+        height: 15px;
+        margin: 0px 10px
+    }
+}

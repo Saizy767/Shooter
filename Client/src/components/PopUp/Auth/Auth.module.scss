@@ -1,0 +1,14 @@
+.Auth{
+    &_registrationByOtherPanel{
+        position: relative;
+        height: 20%;
+        display: flex;
+        justify-content: center;
+        gap: 8%;
+    }
+    &_iconCompanies{
+        height: 38px;
+        width: auto;
+        cursor: pointer;
+    }
+}

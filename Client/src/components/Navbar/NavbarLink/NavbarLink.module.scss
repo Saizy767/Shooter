@@ -1,0 +1,74 @@
+.NavLinks{
+    position: absolute;
+    display: inline-block;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    width: 600px;
+    @media screen and (max-width:1350px) {
+        width:500px
+    }
+    @media screen and (max-width:950px) {
+        width:400px;
+    }
+    @media screen and (max-width:750px) {
+        display: none;
+        visibility: hidden;
+    }
+    &_text{
+        position: relative;
+        width: 106px;
+        height: 30px;
+        font-family: 'Judson', serif;
+        font-weight: 400;
+        font-size: 35px;
+        line-height: 35px;
+        margin: 0 17px;
+        @media screen and (max-width: 1350px) {
+            font-size: 28px;
+            line-height: 28px;
+        }
+        @media screen and (max-width: 950px) {
+            font-size: 21px;
+            line-height: 21px;
+        }
+    }
+}
+
+.underline{
+    position: relative;
+    color: #EBCA8B;
+  &:after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 3px;
+    border-radius: 10px;
+    bottom: 0;
+    left: 0;
+    background-color: #a1622e;
+    transition: transform 0.25s ease-out;
+  }
+  &:hover:after {
+    transform: scaleX(1);
+  }
+}
+.underline_rigth{
+    @extend .underline;
+    &:after{
+        transform-origin: bottom right;
+    }
+    &:hover:after{
+        transform-origin: bottom left;
+    }
+}
+.underline_left{
+    @extend .underline;
+    &:after{
+        transform-origin: bottom left;
+    }
+    &:hover:after{
+        transform-origin: bottom right;
+    }
+}
