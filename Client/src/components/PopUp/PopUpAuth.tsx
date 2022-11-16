@@ -1,6 +1,6 @@
 import { FC } from "react";
-import { ButtonPanelModule } from "../../../models/AuthModule";
-import ButtonPanel from "../components/ButtonPanel/ButtonPanel";
+import { ButtonPanelModule } from "../../models/AuthModule";
+import ButtonPanel from "../ButtonPanel/ButtonPanel";
 import style from './PopUpAuth.module.scss'
 
 type PopUpAuthProp = {

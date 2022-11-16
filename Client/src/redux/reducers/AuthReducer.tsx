@@ -19,7 +19,7 @@ type AuthModule = {
     RegistrateName: string,
     RegistrateSurname: string,
     RegistratePassword: string,
-    RegistrateRepPassowrd: string
+    RegistrateRepPassword: string
 }
 
 const initialState:AuthModule = {
@@ -30,7 +30,7 @@ const initialState:AuthModule = {
             id:1,
             alt:'email',
             placeholder:'Email',
-            type: "email"
+            type: "text"
         },
         {
             id:2,
@@ -64,19 +64,19 @@ const initialState:AuthModule = {
     FirstInputPanelData: [
         {
             id: 1,
-            type: "email",
+            type: "text",
             name: "email",
             placeholder: "E-mail"
         },
         {
             id: 2,
-            type: "other",
+            type: "text",
             name: "name",
             placeholder: "Name"
         },
         {
             id: 3,
-            type: "other",
+            type: "text",
             name: 'surname',
             placeholder: "Surname"
         }
@@ -99,7 +99,7 @@ const initialState:AuthModule = {
         {
             id: 1,
             name: "code",
-            type: "other",
+            type: "text",
             placeholder: "Code"
         },
     ],
@@ -107,7 +107,7 @@ const initialState:AuthModule = {
     RegistrateEmail: '',
     RegistrateName: '',
     RegistratePassword: '',
-    RegistrateRepPassowrd: '',
+    RegistrateRepPassword: '',
     RegistrateSurname: ''
 }
 
@@ -135,7 +135,7 @@ export const authSlice = createSlice({
             state.RegistratePassword = action.payload
         },
         setRegistrateRepPassword:(state, action:PayloadAction<string>)=>{
-            state.RegistrateRepPassowrd = action.payload
+            state.RegistrateRepPassword = action.payload
         },
         setRegistrateEmail:(state, action:PayloadAction<string>)=>{
             state.RegistrateEmail = action.payload

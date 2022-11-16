@@ -1,10 +1,11 @@
 import { FC, useState , useCallback} from "react";
 import Input from "./Input";
-import { useTypedDispatch } from "../../../../hooks/useTypedDispatch";
-import { ErrorValidationType, InputPanelModule } from "../../../../models/AuthModule";
+import { useTypedDispatch } from "../../../hooks/useTypedDispatch";
+import { ErrorValidationType, InputPanelModule } from "../../../models/AuthModule";
 import { setErrorValidation, setRegistrateEmail, 
          setRegistrateName, setRegistratePassword, 
-         setRegistrateRepPassword, setRegistrateSurname } from "../../../../redux/reducers/AuthReducer";
+         setRegistrateRepPassword, setRegistrateSurname } from "../../../redux/reducers/AuthReducer";
+import { useTypedSelector } from "../../../hooks/useTypedSelector";
 
 type InputProps = {
     prop: InputPanelModule
@@ -16,6 +17,7 @@ const InputContainer:FC<InputProps> = ({prop}) =>{
     const [Error, setError] = useState<ErrorValidationType>({status: false, description: ''})
     const checkValidation = ((!isFocus || !!value) && !Error.status)
     const dispatch = useTypedDispatch()
+    const {RegistrateRepPassword, RegistratePassword} = useTypedSelector(state=> state.Auth)
 
     const checkEmail = useCallback(()=>{
         if(!(/\S+@\S+\.\S+/.test(value))){
@@ -50,19 +52,33 @@ const InputContainer:FC<InputProps> = ({prop}) =>{
         }
     },[value, dispatch])
 
+    const checkRigthRepPassword = useCallback(()=>{
+        if(RegistratePassword !== RegistrateRepPassword){
+            setError({status:true,
+                      description:`Passwords are not the same`})
+            dispatch(setErrorValidation(true))
+        }
+        else{
+            setError({status: false ,description: ''})
+        }
+    },[RegistratePassword, RegistrateRepPassword, dispatch])
 
     const clickFocus = () => {
         setIsFocus(false)
     }
 
     const clickBlur = useCallback(()=>{
-        switch (prop.type){
+        switch (prop.name){
             case('email'):{
                 value.length ? checkEmail() : checkEmpty()
                 break
             }
             case('password'):{
                 value.length ? checkShortWord(5) : checkEmpty()
+                break
+            }
+            case('reppassword'):{
+                checkRigthRepPassword()
                 break
             }
             case('other'):{
@@ -73,7 +89,7 @@ const InputContainer:FC<InputProps> = ({prop}) =>{
                 setIsFocus(true)
             }
         }
-    },[checkEmail,checkShortWord,checkEmpty, prop.type, value])
+    },[checkEmail,checkShortWord,checkEmpty,checkRigthRepPassword, prop.name, value])
 
     const clickInput= useCallback((e: React.ChangeEvent<HTMLInputElement>)=>{
         switch(prop.name){

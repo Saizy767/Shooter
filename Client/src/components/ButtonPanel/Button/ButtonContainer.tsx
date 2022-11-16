@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { ButtonPanelModule } from "../../../../models/AuthModule";
+import { ButtonPanelModule } from "../../../models/AuthModule";
 import Button from "./Button";
 
 type ButtonProps = {

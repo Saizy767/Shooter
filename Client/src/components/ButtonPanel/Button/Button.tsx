@@ -1,7 +1,7 @@
 import { FC, useRef } from "react";
 import style from "./Button.module.scss"
-import { ButtonPanelModule } from "../../../../models/AuthModule";
-import useHover from "../../../../hooks/useHover";
+import { ButtonPanelModule } from "../../../models/AuthModule";
+import useHover from "../../../hooks/useHover";
 
 type ButtonProps = {
     props: ButtonPanelModule,

@@ -1,7 +1,7 @@
 import { FC } from "react";
 import style from './InputPanel.module.scss'
-import { InputPanelModule } from "../../../../models/AuthModule";
-import InputContainer from "../Input/InputContainer";
+import { InputPanelModule } from "../../models/AuthModule";
+import InputContainer from "./Input/InputContainer";
 
 type InputPanelProps = {
     props: InputPanelModule[]

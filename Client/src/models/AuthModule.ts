@@ -11,10 +11,10 @@ export type IconPanelModule = {
 }
 export type InputPanelModule = {
     id:number,
-    name?: string,
+    name?: 'password'|'coctail'|'reppassword'|'email'| string,
     alt?:string,
     placeholder?:string,
-    type?: 'password' | 'email' | 'coctail' | 'other'
+    type?: 'password' | 'text' 
 }
 
 export type ErrorValidationType = { 

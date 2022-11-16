@@ -1,10 +1,10 @@
 import { FC } from "react";
 import { ButtonPanelModule, InputPanelModule } from "../../../models/AuthModule";
-import InputPanel from "../components/InputPanel/InputPanel";
-import PopUpAuth from "../PopUpAuth/PopUpAuth";
+import InputPanel from "../../InputPanel/InputPanel";
+import PopUpAuth from "../PopUpAuth";
 import { stepsType } from "./RegistrationContainer";
 import style from './Registration.module.scss'
-import ButtonContainer from "../components/Button/ButtonContainer";
+import ButtonContainer from "../../ButtonPanel/Button/ButtonContainer";
 
 
 type RegistrationProps = {

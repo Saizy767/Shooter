@@ -1,6 +1,6 @@
 import { FC } from "react";
-import { ButtonPanelModule } from "../../../../models/AuthModule";
-import ButtonContainer from "../Button/ButtonContainer";
+import { ButtonPanelModule } from "../../models/AuthModule";
+import ButtonContainer from "./Button/ButtonContainer";
 import style from './ButtonPanel.module.scss'
 
 type ButtonPanelProps={

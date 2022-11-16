@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { InputPanelModule } from "../../../../models/AuthModule";
+import { InputPanelModule } from "../../../models/AuthModule";
 import style from './Input.module.scss'
 
 type InputProps = {

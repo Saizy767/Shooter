@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { ButtonPanelModule, IconPanelModule, InputPanelModule } from "../../../models/AuthModule";
-import InputPanel from "../components/InputPanel/InputPanel";
-import PopUpAuth from "../PopUpAuth/PopUpAuth";
+import InputPanel from "../../InputPanel/InputPanel";
+import PopUpAuth from "../PopUpAuth";
 import style from "./Auth.module.scss"
 
 type AuthProps = {
