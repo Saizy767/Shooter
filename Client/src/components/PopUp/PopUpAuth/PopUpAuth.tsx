@@ -9,8 +9,11 @@ type PopUpAuthProp = {
     ButtonPanelProps: ButtonPanelModule[]
 }
 const PopUpAuth:FC<PopUpAuthProp>=({title, children, ButtonPanelProps})=>{
+    const clickPopUp = (e:React.MouseEvent<HTMLDivElement, MouseEvent>) =>{
+        e.stopPropagation()
+    }
     return(
-        <div className={style.PopUpAuth}>
+        <div className={style.PopUpAuth} onClick={(e)=>clickPopUp(e)}>
             <h3 className={style.PopUpAuth_header}>{title}</h3>
             {children}
             <ButtonPanel props={ButtonPanelProps}/>

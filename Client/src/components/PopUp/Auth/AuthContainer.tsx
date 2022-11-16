@@ -2,21 +2,22 @@ import { FC } from "react";
 import { useTypedDispatch } from "../../../hooks/useTypedDispatch";
 import { useTypedSelector } from "../../../hooks/useTypedSelector";
 import { ButtonPanelModule } from "../../../models/AuthModule";
-import { setVisibilityRegistration } from "../../../redux/reducers/navbarReducer";
+import { setVisibilityAuth, setVisibilityRegistration } from "../../../redux/reducers/navbarReducer";
 import Auth from "./Auth";
 
 
 const AuthContainer:FC = () =>{
     const dispatch = useTypedDispatch()
-    const {InputPanelData,IconPanel} = useTypedSelector((state)=> state.Auth)
+    const {InputPanelData,IconPanel, ErrorValidation} = useTypedSelector((state)=> state.Auth)
 
     const ButtonPanelData: ButtonPanelModule[] = [
         {name: 'Registration',
-        onClick: () => dispatch(setVisibilityRegistration(true)),
+        onClick: () => [dispatch(setVisibilityRegistration(true)), dispatch(setVisibilityAuth(false))],
         id:1
         },
         {name: 'Log in',
-        onClick: () => dispatch(setVisibilityRegistration(false)),
+        onClick: () => [dispatch(setVisibilityRegistration(false)), ],
+        typeMessage: ErrorValidation ? 'Not' : 'Ok',
         id:2
     }
     ]

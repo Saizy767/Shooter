@@ -14,6 +14,12 @@ type AuthModule = {
     FirstInputPanelData: InputPanelModule[],
     SecondInputPanelData: InputPanelModule[],
     ThirdInputPanelData: InputPanelModule[],
+    ErrorValidation: boolean,
+    RegistrateEmail: string,
+    RegistrateName: string,
+    RegistrateSurname: string,
+    RegistratePassword: string,
+    RegistrateRepPassowrd: string
 }
 
 const initialState:AuthModule = {
@@ -24,7 +30,7 @@ const initialState:AuthModule = {
             id:1,
             alt:'email',
             placeholder:'Email',
-            type: "text"
+            type: "email"
         },
         {
             id:2,
@@ -58,17 +64,20 @@ const initialState:AuthModule = {
     FirstInputPanelData: [
         {
             id: 1,
-            type: "text",
+            type: "email",
+            name: "email",
             placeholder: "E-mail"
         },
         {
             id: 2,
-            type: "text",
+            type: "other",
+            name: "name",
             placeholder: "Name"
         },
         {
             id: 3,
-            type: "text",
+            type: "other",
+            name: 'surname',
             placeholder: "Surname"
         }
     ],
@@ -76,21 +85,30 @@ const initialState:AuthModule = {
         {
             id: 1,
             type: "password",
+            name: "password",
             placeholder: "Password"
         },
         {
             id: 2,
             type: "password",
+            name: "reppassword",
             placeholder: "Repeat password"
         },
     ],
     ThirdInputPanelData: [
         {
             id: 1,
-            type: "text",
+            name: "code",
+            type: "other",
             placeholder: "Code"
         },
-    ]
+    ],
+    ErrorValidation: false,
+    RegistrateEmail: '',
+    RegistrateName: '',
+    RegistratePassword: '',
+    RegistrateRepPassowrd: '',
+    RegistrateSurname: ''
 }
 
 export const authSlice = createSlice({
@@ -103,13 +121,32 @@ export const authSlice = createSlice({
         },
         setVisibilityRegistration: (state, action: PayloadAction<boolean>)=>{
             state.visibilityRegistration = action.payload;
-            state.visibilityRegistration = !action.payload;
-        }
+        },
+        setErrorValidation:(state, action:PayloadAction<boolean>)=>{
+            state.ErrorValidation = action.payload;
+        },
+        setRegistrateName:(state, action:PayloadAction<string>)=>{
+            state.RegistrateName = action.payload
+        },
+        setRegistrateSurname:(state, action:PayloadAction<string>)=>{
+            state.RegistrateSurname = action.payload
+        },
+        setRegistratePassword:(state, action:PayloadAction<string>)=>{
+            state.RegistratePassword = action.payload
+        },
+        setRegistrateRepPassword:(state, action:PayloadAction<string>)=>{
+            state.RegistrateRepPassowrd = action.payload
+        },
+        setRegistrateEmail:(state, action:PayloadAction<string>)=>{
+            state.RegistrateEmail = action.payload
+        },
     }
 }
 )
 
 
-export const {setVisibilityAuth, setVisibilityRegistration} = authSlice.actions
+export const {setVisibilityAuth, setVisibilityRegistration, setErrorValidation,
+              setRegistrateEmail, setRegistrateName, setRegistratePassword,
+              setRegistrateRepPassword, setRegistrateSurname} = authSlice.actions
 export default authSlice
 

@@ -1,13 +1,12 @@
 create TABLE person(
     id SERIAL PRIMARY KEY,
-    email unique text,
-    password text,
+    email VARCHAR (50) UNIQUE,
+    password VARCHAR(255),
     name VARCHAR(255),
     surname VARCHAR(255),
     favorites json,
     homebar json,
-    isActivated boolean,
-    activationLink text
+    isActivated boolean
 );
 
 create TABLE cocteil(

@@ -1,18 +1,22 @@
+import { CoctailType, ingredientType } from '../models/user-modules';
 import { Request, Response } from 'express';
 import bd from '../database/db'
 
 class UserController{
-    async createUser(req: Request,res: Response){
-        const {name, surname, favorites,
-               homebar, password} = req.body
+    async registrateUser(req: Request,res: Response){
+        const {RegistrateName, RegistrateSurname, RegistrateEmail, RegistratePassword} = req.body
+        const favorites:CoctailType[] = []
+        const homebar:ingredientType[] = []
+        const isActivated:boolean = false
         const newPerson = await bd.query(
-            `INSERT INTO person (name,surname,favorites,homebar,password) VALUES ($1,$2,$3,$4,$5) RETURNING *`,
-            [name, surname, favorites, homebar, password])
+            `INSERT INTO person (name, surname, favorites, homebar, password, email, isActivated)
+             VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
+            [RegistrateName, RegistrateSurname, favorites, homebar, RegistratePassword, RegistrateEmail, isActivated])
         res.json(newPerson.rows)
     }
     async getUsers(req: Request,res: Response){
         const users = await bd.query(`select * from person`)
-        res.json(users.rows[0])
+        res.json(users.rows)
     }
     async deleteUser(req: Request,res: Response){
         const id = req.params.id

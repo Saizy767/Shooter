@@ -3,7 +3,7 @@ import userController from '../controllers/user.controller'
 
 const userRoute = Router()
 
-userRoute.post('/user', userController.createUser)
+userRoute.post('/user/registration', userController.registrateUser)
 userRoute.delete('/user/:id', userController.deleteUser)
 userRoute.get('/user', userController.getUsers)
 userRoute.get('/user/:id', userController.getOneUser)

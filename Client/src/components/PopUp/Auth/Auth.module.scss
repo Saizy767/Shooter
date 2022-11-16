@@ -1,7 +1,8 @@
 .Auth{
     &_registrationByOtherPanel{
-        position: relative;
-        height: 20%;
+        position: absolute;
+        bottom: 35%;
+        width: 100%;
         display: flex;
         justify-content: center;
         gap: 8%;

@@ -1,5 +1,3 @@
-
-
 export type ButtonPanelModule = {
     name: string,
     onClick?: ((T:any) => void) | undefined,
@@ -13,7 +11,13 @@ export type IconPanelModule = {
 }
 export type InputPanelModule = {
     id:number,
+    name?: string,
     alt?:string,
     placeholder?:string,
-    type?: string
+    type?: 'password' | 'email' | 'coctail' | 'other'
+}
+
+export type ErrorValidationType = { 
+    status: boolean
+    description: string
 }

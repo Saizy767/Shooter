@@ -4,21 +4,17 @@ import { ButtonPanelModule } from "../../../../models/AuthModule";
 import useHover from "../../../../hooks/useHover";
 
 type ButtonProps = {
-    props: ButtonPanelModule
+    props: ButtonPanelModule,
+    HoveredColor: string
 }
 
-const Button:FC<ButtonProps> = ({props}) =>{
+const Button:FC<ButtonProps> = ({props, HoveredColor}) =>{
     const ref = useRef(null)
     const isHovered = useHover(ref)
-    let HoveredColor = 'rgb(104, 182, 88)'
-    if (props.typeMessage === 'Not'){
-        HoveredColor = '#d22626'
-    }
-    else if (props.typeMessage === 'Warning'){
-        HoveredColor = '#e28c3f'
-    }
     return(
-        <button className={style.BigButton} ref={ref} onClick={props?.onClick} key={props.id} style={isHovered ? {backgroundColor: `${HoveredColor}`}:{}} >{props?.name}</button>
+        <button className={style.BigButton} ref={ref}
+         onClick={props?.onClick} key={props.id} 
+         style={isHovered ? {backgroundColor: `${HoveredColor}`}:{}} >{props?.name}</button>
     )
 }
 

@@ -1,0 +1,31 @@
+.InputRegistration{
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 75px;
+    justify-content: center;
+    padding: 0 10%;
+    &_input{
+    position: relative;
+    width: 100%;
+    margin: 12px 0;
+    height: 40px;
+    font-size: 24px;
+    border-radius: 5px;
+    padding: 20px 0;
+    border: rgb(56, 56, 56) 2px solid;
+    }
+    &_focus{
+        border: rgb(245, 47, 47) 2px solid;
+        background-color: rgb(236, 114, 114);
+    }
+    &_warning{
+        position: absolute;
+        z-index: 10;
+        top: -10px;
+        left: 10%;
+        color: rgb(245, 47, 47);
+        font-size: 18px;
+        font-weight: 800;
+    }   
+}

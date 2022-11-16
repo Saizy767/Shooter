@@ -4,7 +4,7 @@ import InputPanel from "../components/InputPanel/InputPanel";
 import PopUpAuth from "../PopUpAuth/PopUpAuth";
 import { stepsType } from "./RegistrationContainer";
 import style from './Registration.module.scss'
-import Button from "../components/Button/Button";
+import ButtonContainer from "../components/Button/ButtonContainer";
 
 
 type RegistrationProps = {
@@ -14,10 +14,13 @@ type RegistrationProps = {
     steps: stepsType,
     ButtonPanelData: ButtonPanelModule[],
     InputPanelData: InputPanelModule[],
-    TimerButtonProps: ButtonPanelModule
+    TimerButtonProps: ButtonPanelModule,
+    visibilityRegistration: any,
     timer: number
 }
-const Registration:FC<RegistrationProps> = ({step, steps, ButtonPanelData, InputPanelData, timer, TimerButtonProps})=>{
+const Registration:FC<RegistrationProps> = ({step, steps, ButtonPanelData,
+                                             InputPanelData, timer, TimerButtonProps,
+                                             visibilityRegistration})=>{
     return(
         <PopUpAuth title={'Registration'} ButtonPanelProps={ButtonPanelData}>
             {steps.firstStep === step && 
@@ -33,7 +36,7 @@ const Registration:FC<RegistrationProps> = ({step, steps, ButtonPanelData, Input
                     <span className={style.Timer}>If code dont came after {timer} seconds click on button</span>
                     {!timer && 
                     <div className={style.Button}>
-                        <Button props={TimerButtonProps}/>
+                        <ButtonContainer props={TimerButtonProps}/>
                     </div>}
                 </>
             }
