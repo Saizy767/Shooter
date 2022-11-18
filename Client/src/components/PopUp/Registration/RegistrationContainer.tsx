@@ -1,8 +1,12 @@
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, useEffect } from "react";
 import { useTypedDispatch } from "../../../hooks/useTypedDispatch";
 import { useTypedSelector } from "../../../hooks/useTypedSelector";
-import { ButtonPanelModule } from "../../../models/AuthModule";
-import { setVisibilityAuth, setVisibilityRegistration } from "../../../redux/reducers/navbarReducer";
+import { FirstInputPanelData, SecondInputPanelData, ThirdInputPanelData } from "../../../models/AuthStore";
+import { ButtonPanelType } from "../../../models/AuthTypes";
+import { clickToRegistration } from "../../../redux/reducers/AuthReducer";
+import { clickCompleteRegistration, clickNextStepRegistration,
+         setPrevStepRegistration, 
+         setTimer} from "../../../redux/reducers/RegistrateReduce";
 import Registration from "./Registration";
 
 export type stepsType = {
@@ -12,112 +16,52 @@ export type stepsType = {
 }
 
 const RegistrationContainer:FC=()=>{
-    const [step, setStep] = useState<number>(0)
-    const [timer, setTimer] = useState<number>(30)
+    const {ErrorValidation} = useTypedSelector((state)=> state.Auth)
+    const {CurrentStepRegistration, Timer} = useTypedSelector((state)=> state.Registrate)
 
     const dispatch = useTypedDispatch()
 
-    const {FirstInputPanelData,SecondInputPanelData,ThirdInputPanelData,
-           ErrorValidation, visibilityRegistration} = useTypedSelector((state)=> state.Auth)
-    const {RegistrateEmail,RegistrateSurname,
-           RegistrateName, RegistratePassword} = useTypedSelector((state)=> state.Auth)
-
-    const InputPanelData = step === 0 ? FirstInputPanelData : 
-                           step === 1 ? SecondInputPanelData : ThirdInputPanelData
+    const TimerButton: ButtonPanelType = {
+        id:1,
+        name: "Send Again",
+        onClick: () => dispatch(setTimer(20)),
+        typeMessage: 'Warning'
+    }
+    const ButtonPanelData:ButtonPanelType[] = [
+        {
+            id: 1,
+            name: CurrentStepRegistration === 0 ? "Authorization": "Back",
+            onClick: CurrentStepRegistration === 0 ? ()=> dispatch(clickToRegistration(false)) : 
+                                                     ()=> dispatch(setPrevStepRegistration()),
+            typeMessage: CurrentStepRegistration === 0 ? 'Ok' : 'Not'
+        },
+        {
+            id:2, 
+            name: CurrentStepRegistration === 2 ? "Complete" : "Next",
+            onClick: CurrentStepRegistration === 2 ? ()=>dispatch(clickCompleteRegistration()) : 
+                                                     ()=>dispatch(clickNextStepRegistration()),
+            typeMessage: ErrorValidation ? 'Not': 'Ok'
+        }
+    ]
     const steps: stepsType = {
         firstStep: 0,
         secondStep: 1,
         thirdStep: 2,
     }
+
+    const InputPanelData = CurrentStepRegistration === 0 ? FirstInputPanelData : 
+                           CurrentStepRegistration === 1 ? SecondInputPanelData : ThirdInputPanelData
     
     useEffect(()=>{
         setTimeout(()=>{
-            step === 2 && timer && setTimer(timer-1)
+            CurrentStepRegistration === 2 && Timer && dispatch(setTimer(Timer-1))
         },1000)
-    },[timer, step])
-
-    const clickRegistration = useCallback((boolean:boolean) =>{
-        dispatch(setVisibilityRegistration(!boolean))
-        dispatch(setVisibilityAuth(boolean))
-    },[dispatch])
-
-    const clickTimer = useCallback((arg: number)=>{
-        setTimer(arg)
-    },[])
-
-    async function postData(url = '', data = {}) {
-        const response = await fetch(url, {
-          method: 'POST', 
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data)
-        });
-        return await response.json();
-      }
-      
-
-    const handleComplete = useCallback(()=>{
-        dispatch(setVisibilityRegistration(false))
-    },[dispatch])
-
-    const handlePrevStep = useCallback(() =>{
-        if(step === 0){
-            setStep(0)
-        }
-        setStep(step-1)
-    },[step])
-
-    const handleNextStep = useCallback(()=>{
-        if(!ErrorValidation){
-            switch(step){
-                case(0):{
-                    setStep(step+1)
-                    break
-                }
-                case(1):{
-                    postData(process.env.REACT_APP_USER_REGISTRATION, 
-                    {RegistrateName, RegistrateSurname, RegistrateEmail, RegistratePassword})
-                    setTimer(30)
-                    setStep(step+1)
-                    break
-                }
-                case(2):{
-                    setStep(2)
-                    break
-                }
-                default:{
-                    setStep(step+1)
-                }
-        }}
-    },[step, ErrorValidation, RegistrateEmail, RegistratePassword, RegistrateSurname, RegistrateName])
-
-    const TimerButton: ButtonPanelModule = {
-        id:1,
-        name: "Send Again",
-        onClick: () => clickTimer(20),
-        typeMessage: 'Warning'
-    }
-
-    const ButtonPanelData:ButtonPanelModule[] = [
-        {
-            id: 1,
-            name: step === 0 ? "Authorization": "Back",
-            onClick: step === 0 ? ()=> clickRegistration(true) : ()=>handlePrevStep(),
-            typeMessage: step === 0 ? 'Ok' : 'Not'
-        },
-        {
-            id:2, 
-            name: step === 2 ? "Complete" : "Next",
-            onClick: step === 2 ? ()=>handleComplete() : ()=>handleNextStep(),
-            typeMessage: ErrorValidation ? 'Not': 'Ok'
-        }
-    ]
+    },[dispatch, CurrentStepRegistration, Timer])
+    
     return(
-        <Registration step={step} steps={steps} 
-                      handleNextStep={handleNextStep} clickRegistration={clickRegistration}
-                      ButtonPanelData={ButtonPanelData} InputPanelData={InputPanelData} timer={timer}
-                      TimerButtonProps={TimerButton} visibilityRegistration={visibilityRegistration}/>
+        <Registration step={CurrentStepRegistration} steps={steps} 
+                      ButtonPanelData={ButtonPanelData} InputPanelData={InputPanelData} timer={Timer}
+                      TimerButtonProps={TimerButton}/>
     )
 }
 

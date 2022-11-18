@@ -1,10 +1,10 @@
 import { FC } from "react";
-import { ButtonPanelModule } from "../../models/AuthModule";
+import { ButtonPanelType } from "../../models/AuthTypes";
 import ButtonContainer from "./Button/ButtonContainer";
 import style from './ButtonPanel.module.scss'
 
 type ButtonPanelProps={
-    props: ButtonPanelModule[]
+    props: ButtonPanelType[]
 }
 const ButtonPanel: FC<ButtonPanelProps> = ({props}) =>{
     return (

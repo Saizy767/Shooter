@@ -1,10 +1,10 @@
 import { FC, useRef } from "react";
 import style from "./Button.module.scss"
-import { ButtonPanelModule } from "../../../models/AuthModule";
+import { ButtonPanelType } from "../../../models/AuthTypes";
 import useHover from "../../../hooks/useHover";
 
 type ButtonProps = {
-    props: ButtonPanelModule,
+    props: ButtonPanelType,
     HoveredColor: string
 }
 

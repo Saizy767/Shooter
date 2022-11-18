@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { ButtonPanelModule, InputPanelModule } from "../../../models/AuthModule";
+import { ButtonPanelType, InputPanelType } from "../../../models/AuthTypes";
 import InputPanel from "../../InputPanel/InputPanel";
 import PopUpAuth from "../PopUpAuth";
 import { stepsType } from "./RegistrationContainer";
@@ -9,18 +9,15 @@ import ButtonContainer from "../../ButtonPanel/Button/ButtonContainer";
 
 type RegistrationProps = {
     step: number,
-    clickRegistration:(bool:boolean)=>void,
-    handleNextStep: () => void,
     steps: stepsType,
-    ButtonPanelData: ButtonPanelModule[],
-    InputPanelData: InputPanelModule[],
-    TimerButtonProps: ButtonPanelModule,
-    visibilityRegistration: any,
+    ButtonPanelData: ButtonPanelType[],
+    InputPanelData: InputPanelType[],
+    TimerButtonProps: ButtonPanelType,
     timer: number
 }
 const Registration:FC<RegistrationProps> = ({step, steps, ButtonPanelData,
                                              InputPanelData, timer, TimerButtonProps,
-                                             visibilityRegistration})=>{
+                                             })=>{
     return(
         <PopUpAuth title={'Registration'} ButtonPanelProps={ButtonPanelData}>
             {steps.firstStep === step && 

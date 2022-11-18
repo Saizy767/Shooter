@@ -1,13 +1,13 @@
 import { FC } from "react";
-import { ButtonPanelModule, IconPanelModule, InputPanelModule } from "../../../models/AuthModule";
+import { ButtonPanelType, IconPanelType, InputPanelType } from "../../../models/AuthTypes";
 import InputPanel from "../../InputPanel/InputPanel";
 import PopUpAuth from "../PopUpAuth";
 import style from "./Auth.module.scss"
 
 type AuthProps = {
-    ButtonPanelData: ButtonPanelModule[]
-    InputPanelData: InputPanelModule[]
-    IconPanel: IconPanelModule[]
+    ButtonPanelData: ButtonPanelType[]
+    InputPanelData: InputPanelType[]
+    IconPanel: IconPanelType[]
 }
 const Auth:FC<AuthProps>=({ButtonPanelData, InputPanelData, IconPanel})=>{
     return (

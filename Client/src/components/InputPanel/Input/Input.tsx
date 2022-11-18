@@ -1,9 +1,9 @@
 import { FC } from "react";
-import { InputPanelModule } from "../../../models/AuthModule";
+import { InputPanelType } from "../../../models/AuthTypes";
 import style from './Input.module.scss'
 
 type InputProps = {
-    prop: InputPanelModule,
+    prop: InputPanelType,
     clickInput:(el: React.ChangeEvent<HTMLInputElement>) => void,
     clickBlur:()=>void,
     clickFocus:()=>void,

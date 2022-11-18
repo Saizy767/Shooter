@@ -1,7 +1,7 @@
 import { FC, useCallback, useEffect, useState} from "react";
 import { useTypedDispatch } from "../../hooks/useTypedDispatch";
 import { useTypedSelector } from "../../hooks/useTypedSelector";
-import { setVisibilityAuth } from "../../redux/reducers/navbarReducer";
+import { setVisibilityAuth } from "../../redux/reducers/AuthReducer";
 import { setCurrentPosition, setPreviousPosition } from "../../redux/reducers/screenReducer";
 import { setVisibilitySearch } from "../../redux/reducers/searchReducer";
 import NavbarView from './NavbarView'

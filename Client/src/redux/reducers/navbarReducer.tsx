@@ -12,8 +12,6 @@ type NavbarModule = {
     previousIdLink: number,
     currentIdLink: number,
     linkObject: LinkType[],
-    visibilityAuth: boolean,
-    visibilityRegistration: boolean
 }
 
 const initialState:NavbarModule = {
@@ -24,8 +22,6 @@ const initialState:NavbarModule = {
         {name:'Non-alcoholic', color:'#995D2D', href:NonAlcoholicHref.href, id:2},
         {name:'Home Bar', color:'#000000', href:HomeBarHref.href, id:3}
         ],
-    visibilityAuth: false,
-    visibilityRegistration: false
     
 }
 
@@ -40,17 +36,12 @@ export const navbarSlice = createSlice({
         setCurrentIdLink: (state, action: PayloadAction<number>) =>{
             state.currentIdLink = action.payload
         },
-        setVisibilityAuth: (state, action: PayloadAction<boolean>)=>{
-            state.visibilityAuth = action.payload
-        },
-        setVisibilityRegistration: (state, action: PayloadAction<boolean>)=>{
-            state.visibilityRegistration = action.payload
-        }
+
     }
 }
 )
 
 
-export const { setPreviousIdLink, setCurrentIdLink, setVisibilityAuth, setVisibilityRegistration} = navbarSlice.actions
+export const { setPreviousIdLink, setCurrentIdLink} = navbarSlice.actions
 export default navbarSlice
 

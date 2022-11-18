@@ -1,12 +1,12 @@
 import { FC } from "react";
-import { ButtonPanelModule } from "../../models/AuthModule";
+import { ButtonPanelType } from "../../models/AuthTypes";
 import ButtonPanel from "../ButtonPanel/ButtonPanel";
 import style from './PopUpAuth.module.scss'
 
 type PopUpAuthProp = {
     title: string,
     children: React.ReactNode,
-    ButtonPanelProps: ButtonPanelModule[]
+    ButtonPanelProps: ButtonPanelType[]
 }
 const PopUpAuth:FC<PopUpAuthProp>=({title, children, ButtonPanelProps})=>{
     const clickPopUp = (e:React.MouseEvent<HTMLDivElement, MouseEvent>) =>{

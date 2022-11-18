@@ -7,14 +7,14 @@ import { useTypedSelector } from "../hooks/useTypedSelector";
 import RegistrationContainer from "../components/PopUp/Registration/RegistrationContainer";
 import AuthContainer from "../components/PopUp/Auth/AuthContainer";
 import { useTypedDispatch } from "../hooks/useTypedDispatch";
-import { setVisibilityAuth, setVisibilityRegistration } from "../redux/reducers/navbarReducer";
+import { setVisibilityAuth, setVisibilityRegistration } from "../redux/reducers/AuthReducer";
 
 
 type UniPageType = {
     children?: React.ReactNode
 }
 const UniPage:FC<UniPageType>=({children})=>{
-    const {visibilityAuth, visibilityRegistration} = useTypedSelector((state)=>state.Navbar)
+    const {visibilityAuth, visibilityRegistration} = useTypedSelector((state)=>state.Auth)
     const dispatch = useTypedDispatch()
     
     const removePopUp = useCallback(() =>{

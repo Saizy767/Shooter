@@ -1,9 +1,9 @@
 import { FC } from "react";
-import { ButtonPanelModule } from "../../../models/AuthModule";
+import { ButtonPanelType } from "../../../models/AuthTypes";
 import Button from "./Button";
 
 type ButtonProps = {
-    props: ButtonPanelModule
+    props: ButtonPanelType
 }
 
 const ButtonContainer:FC<ButtonProps> =({props}) => {

@@ -1,10 +1,10 @@
 import { FC } from "react";
 import style from './InputPanel.module.scss'
-import { InputPanelModule } from "../../models/AuthModule";
+import { InputPanelType } from "../../models/AuthTypes";
 import InputContainer from "./Input/InputContainer";
 
 type InputPanelProps = {
-    props: InputPanelModule[]
+    props: InputPanelType[]
 }
 const InputPanel:FC<InputPanelProps>=({props})=>{
     return (

@@ -1,4 +1,4 @@
-import Logo from '../../Images/Log.svg'
+import Logo from '../../assets/images/Log.svg'
 import style from "./Navbar.module.scss"
 import {HiLockClosed} from 'react-icons/hi'
 import {GoSearch} from 'react-icons/go'

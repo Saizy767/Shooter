@@ -1,14 +1,15 @@
 import { FC, useState , useCallback} from "react";
 import Input from "./Input";
 import { useTypedDispatch } from "../../../hooks/useTypedDispatch";
-import { ErrorValidationType, InputPanelModule } from "../../../models/AuthModule";
-import { setErrorValidation, setRegistrateEmail, 
+import { ErrorValidationType, InputPanelType } from "../../../models/AuthTypes";
+import { setRegistrateEmail, 
          setRegistrateName, setRegistratePassword, 
-         setRegistrateRepPassword, setRegistrateSurname } from "../../../redux/reducers/AuthReducer";
+         setRegistrateRepPassword, setRegistrateSurname } from "../../../redux/reducers/RegistrateReduce";
 import { useTypedSelector } from "../../../hooks/useTypedSelector";
+import { setErrorValidation } from "../../../redux/reducers/AuthReducer";
 
 type InputProps = {
-    prop: InputPanelModule
+    prop: InputPanelType
 }
 
 const InputContainer:FC<InputProps> = ({prop}) =>{
@@ -17,7 +18,7 @@ const InputContainer:FC<InputProps> = ({prop}) =>{
     const [Error, setError] = useState<ErrorValidationType>({status: false, description: ''})
     const checkValidation = ((!isFocus || !!value) && !Error.status)
     const dispatch = useTypedDispatch()
-    const {RegistrateRepPassword, RegistratePassword} = useTypedSelector(state=> state.Auth)
+    const {RegistrateRepPassword, RegistratePassword} = useTypedSelector(state=> state.Registrate)
 
     const checkEmail = useCallback(()=>{
         if(!(/\S+@\S+\.\S+/.test(value))){

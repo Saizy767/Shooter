@@ -1,15 +1,15 @@
-export type ButtonPanelModule = {
+export type ButtonPanelType = {
     name: string,
     onClick?: ((T:any) => void) | undefined,
     id:number,
     typeMessage?: 'Ok' | 'Warning' | 'Not'
 }
-export type IconPanelModule = {
+export type IconPanelType = {
     id: number,
     name: string,
     img: string
 }
-export type InputPanelModule = {
+export type InputPanelType = {
     id:number,
     name?: 'password'|'coctail'|'reppassword'|'email'| string,
     alt?:string,

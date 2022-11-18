@@ -7,6 +7,7 @@ import searchSlice from "./reducers/searchReducer";
 import homeMenuBlogSlice from './reducers/homeMenuBlogReducer'
 import BlogEmotionSlice from "./reducers/EmotionRowReducer";
 import authSlice from "./reducers/AuthReducer";
+import registrateSlice from "./reducers/RegistrateReduce";
 
 
 const rootReducer = combineReducers({
@@ -15,15 +16,17 @@ const rootReducer = combineReducers({
     Search: searchSlice.reducer,
     HomeMenuBlog:homeMenuBlogSlice.reducer,
     EmotionRow:BlogEmotionSlice.reducer,
-    Auth: authSlice.reducer
+    Auth: authSlice.reducer,
+    Registrate: registrateSlice.reducer
 })
 
 export const setupStore = () => {
     return configureStore({
         reducer: rootReducer,
-        middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+        middleware: (getDefaultMiddleware) =>
+            getDefaultMiddleware({
             serializableCheck: false,
-          }),
+        }),
     })
 }
 
