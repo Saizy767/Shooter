@@ -11,7 +11,7 @@ export const InputPanelData:InputPanelType[] = [
         id:1,
         alt:'email',
         placeholder:'Email',
-        type: "text"
+        type: "text",
     },
     {
         id:2,
@@ -41,46 +41,4 @@ export const IconPanel: IconPanelType[] =[
         name: "Odnoklassniki",
         img: OdnoklassnikiLogo
     }
-]
-export const FirstInputPanelData:InputPanelType[] = [
-    {
-        id: 1,
-        type: "text",
-        name: "email",
-        placeholder: "E-mail"
-    },
-    {
-        id: 2,
-        type: "text",
-        name: "name",
-        placeholder: "Name"
-    },
-    {
-        id: 3,
-        type: "text",
-        name: 'surname',
-        placeholder: "Surname"
-    }
-]
-export const SecondInputPanelData:InputPanelType[] =[
-    {
-        id: 1,
-        type: "password",
-        name: "password",
-        placeholder: "Password"
-    },
-    {
-        id: 2,
-        type: "password",
-        name: "reppassword",
-        placeholder: "Repeat password"
-    },
-]
-export const ThirdInputPanelData:InputPanelType[] = [
-    {
-        id: 1,
-        name: "code",
-        type: "text",
-        placeholder: "Code"
-    },
 ]

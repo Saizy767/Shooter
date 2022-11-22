@@ -1,8 +1,7 @@
 import { FC } from "react";
-import { ButtonPanelType, InputPanelType } from "../../../models/AuthTypes";
+import { ButtonPanelType, InputPanelType, stepsType } from "../../../models/AuthTypes";
 import InputPanel from "../../InputPanel/InputPanel";
 import PopUpAuth from "../PopUpAuth";
-import { stepsType } from "./RegistrationContainer";
 import style from './Registration.module.scss'
 import ButtonContainer from "../../ButtonPanel/Button/ButtonContainer";
 

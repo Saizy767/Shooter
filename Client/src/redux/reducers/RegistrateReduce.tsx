@@ -1,26 +1,53 @@
-import { AnyAction, createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit'
+import { stateInputType } from '../../models/AuthTypes';
 import { RootState } from '../rootReducer';
 import { PostData } from './APIReducer';
-import { setVisibilityRegistration } from './AuthReducer';
+import { setAnyOneFocus, setErrorValidation, setNextStepRegistration, setTimer, setVisibilityRegistration } from './AuthReducer';
 
 type RegistrateType = {
-    RegistrateEmail: string,
-    RegistrateName: string,
-    RegistrateSurname: string,
-    RegistratePassword: string,
-    RegistrateRepPassword: string,
-    CurrentStepRegistration: number,
-    Timer: number
+    RegistrateEmail: stateInputType,
+    RegistrateName: stateInputType,
+    RegistrateSurname: stateInputType,
+    RegistratePassword: stateInputType,
+    RegistrateRepPassword: stateInputType,
 }
 
 const initialState:RegistrateType = {
-    RegistrateEmail: '',
-    RegistrateName: '',
-    RegistratePassword: '',
-    RegistrateRepPassword: '',
-    RegistrateSurname: '',
-    Timer: 0,
-    CurrentStepRegistration: 0
+    RegistrateEmail:{
+        value: '',
+        state: 'Success',
+        description: '',
+        name: 'email',
+        isFocus: false
+    },
+    RegistrateName:{
+        value: '',
+        state: 'Success',
+        description: '',
+        name: 'name',
+        isFocus: false
+    },
+    RegistrateSurname: {
+        value: '',
+        state: 'Success',
+        description: '',
+        name: 'surname',
+        isFocus: false
+    },
+    RegistratePassword: {
+        value: '',
+        state: 'Success',
+        description: '',
+        name: 'password',
+        isFocus: false
+    },
+    RegistrateRepPassword:{
+        value: '',
+        state: 'Success',
+        description: '',
+        name: 'reppassword',
+        isFocus: false
+    },
 }
 
 export const registrateSlice = createSlice({
@@ -28,53 +55,129 @@ export const registrateSlice = createSlice({
     initialState,
     reducers:
     {
-        setRegistrateName:(state, action:PayloadAction<string>)=>{
-            state.RegistrateName = action.payload
+        setRegistrateNameValue:(state, action:PayloadAction<string>)=>{
+            state.RegistrateName.value = action.payload
         },
-        setRegistrateSurname:(state, action:PayloadAction<string>)=>{
-            state.RegistrateSurname = action.payload
+        setRegistrateSurnameValue:(state, action:PayloadAction<string>)=>{
+            state.RegistrateSurname.value = action.payload
         },
-        setRegistratePassword:(state, action:PayloadAction<string>)=>{
-            state.RegistratePassword = action.payload
+        setRegistratePasswordValue:(state, action:PayloadAction<string>)=>{
+            state.RegistratePassword.value = action.payload
         },
-        setRegistrateRepPassword:(state, action:PayloadAction<string>)=>{
-            state.RegistrateRepPassword = action.payload
+        setRegistrateRepPasswordValue:(state, action:PayloadAction<string>)=>{
+            state.RegistrateRepPassword.value = action.payload
         },
-        setRegistrateEmail:(state, action:PayloadAction<string>)=>{
-            state.RegistrateEmail = action.payload
+        setRegistrateEmailValue:(state, action:PayloadAction<string>)=>{
+            state.RegistrateEmail.value = action.payload
         },
-        setNextStepRegistration:(state, action:AnyAction)=>{
-            state.CurrentStepRegistration = state.CurrentStepRegistration === 2 ?
-                                            state.CurrentStepRegistration : 
-                                            state.CurrentStepRegistration + 1
-        },
-        setPrevStepRegistration:(state, action:AnyAction)=>{
-            state.CurrentStepRegistration = state.CurrentStepRegistration === 0 ? 
-                                            state.CurrentStepRegistration : 
-                                            state.CurrentStepRegistration - 1
-        },
-        setTimer:(state, action:PayloadAction<number>)=>{
-            state.Timer= action.payload
+        setCheckForAll:(state, action:PayloadAction<stateInputType>)=>{
+            switch(action.payload.name){
+                case('email'):{
+                    state.RegistrateEmail = action.payload
+                    break
+                }
+                case('name'):{
+                    state.RegistrateName = action.payload
+                    break
+                }
+                case('surname'):{
+                    state.RegistrateSurname = action.payload
+                    break
+                }
+                case('password'):{
+                    state.RegistratePassword = action.payload
+                    break
+                }
+                case('reppassword'):{
+                    state.RegistrateRepPassword = action.payload
+                    break
+                }
+                default:{
+                    console.log('This input didnt in RegistrateReducer')
+                    console.log(action.payload)
+                }
+            }
         }
     }
 })
 
-export const clickCompleteRegistration = createAsyncThunk(
-    'registrate/complete',
-    async(_,{dispatch})=>{
-        dispatch(setVisibilityRegistration(false))
+export const checkEmail = createAsyncThunk(
+    'registration/checkEmail',
+    async(_,{dispatch, getState})=>{
+        const selector = getState() as RootState
+        const value = selector.Registrate.RegistrateEmail.value
+        if(!(/\S+@\S+\.\S+/.test(value))){
+            dispatch(setCheckForAll({value, state: "Error",
+                                     description: 'Email is invalid', name: 'email',
+                                     isFocus:true}))
+            dispatch(setAnyOneFocus(true))
+        }
+        else{
+            dispatch(setCheckForAll({value, state: "Success",
+                                     description: '',name: 'email',
+                                     isFocus:false}))
+        }
+})
+
+export const checkEmpty = createAsyncThunk(
+    'registration/emptyInput',
+    async(input:stateInputType,{dispatch})=>{
+    if(input.value.length === 0){
+        dispatch(setCheckForAll({value:input.value, state: "Error",
+                                 description:'Empty row', name: input.name,
+                                 isFocus:true}))
+        dispatch(setAnyOneFocus(true))
     }
-)
+    else{
+        dispatch(setCheckForAll({value: input.value, state: "Success" ,
+                                 description: '', name: input.name,
+                                 isFocus:false}))
+    }
+})
+
+export const checkLengthWord = createAsyncThunk(
+    'registration/inputLength',
+    async({input,min}:{input:stateInputType, min: number},{dispatch})=>{
+    if(input.value.length <= min){
+        dispatch(setCheckForAll({value: input.value,state: "Error",
+                                 description:`Password length less ${min}`, name:input.name,
+                                 isFocus: true}))
+        dispatch(setAnyOneFocus(true))
+    }
+    else{
+        dispatch(setCheckForAll({value: input.value,state: "Success" ,
+                                 description: '', name:input.name,
+                                 isFocus: false}))
+    }
+})
+
+export const checkRepPassword = createAsyncThunk(
+    'registration/checkRepPassword',
+    async(_, {dispatch, getState})=>{
+        const selector = getState() as RootState
+        const {RegistratePassword, RegistrateRepPassword} = selector.Registrate
+        if(RegistratePassword.value !== RegistrateRepPassword.value){
+            dispatch(setCheckForAll({value: RegistrateRepPassword.value, state:"Error",
+                                     description:`Passwords are not the same`, name:RegistrateRepPassword.name,
+                                     isFocus: true}))
+            dispatch(setAnyOneFocus(true))
+        }
+        else{
+            dispatch(setCheckForAll({value:RegistrateRepPassword.value,state: "Success" ,
+                                     description: '', name: RegistrateRepPassword.name,
+                                     isFocus:false}))
+        }
+})
 
 export const clickNextStepRegistration = createAsyncThunk(
     'registrate/nextpage',
-    async(_,{dispatch, getState})=>{
+    async(stateButton:any,{dispatch, getState})=>{
         const selector = getState() as RootState
         const {RegistrateName, RegistrateSurname, RegistrateEmail,
-               RegistratePassword, CurrentStepRegistration} = selector.Registrate
-        const {ErrorValidation} = selector.Auth
-
-        if(!ErrorValidation){
+               RegistratePassword} = selector.Registrate
+        const {CurrentStepRegistration} = selector.Auth
+        dispatch(setErrorValidation(stateButton))
+        if(stateButton){
             switch(CurrentStepRegistration){
                 case(0):{
                     dispatch(setNextStepRegistration())
@@ -98,9 +201,16 @@ export const clickNextStepRegistration = createAsyncThunk(
     }
 )
 
+export const clickCompleteRegistration = createAsyncThunk(
+    'registrate/complete',
+    async(_,{dispatch})=>{
+        dispatch(setVisibilityRegistration(false))
+    }
+)
 
-export const {setRegistrateEmail, setRegistrateName, setRegistratePassword,
-              setRegistrateRepPassword, setRegistrateSurname, setNextStepRegistration,
-              setPrevStepRegistration, setTimer} = registrateSlice.actions
+
+export const {setRegistrateEmailValue, setRegistrateNameValue, setRegistratePasswordValue,
+              setRegistrateRepPasswordValue, setRegistrateSurnameValue, setCheckForAll
+             } = registrateSlice.actions
 export default registrateSlice
 

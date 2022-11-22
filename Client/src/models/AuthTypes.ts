@@ -14,10 +14,18 @@ export type InputPanelType = {
     name?: 'password'|'coctail'|'reppassword'|'email'| string,
     alt?:string,
     placeholder?:string,
-    type?: 'password' | 'text' 
+    type?: 'password' | 'text',
+    elem?: stateInputType
 }
-
-export type ErrorValidationType = { 
-    status: boolean
-    description: string
+export type stepsType = {
+    firstStep: number,
+    secondStep: number,
+    thirdStep: number
+}
+export type stateInputType = {
+    value: string,
+    state: "Error" | "Success",
+    description: string,
+    name: string,
+    isFocus: boolean
 }

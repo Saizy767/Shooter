@@ -6,14 +6,13 @@ type InputProps = {
     prop: InputPanelType,
     clickInput:(el: React.ChangeEvent<HTMLInputElement>) => void,
     clickBlur:()=>void,
-    clickFocus:()=>void,
     InputValue: string,
-    ErrorDesctiption: string,
+    ErrorDesctiption: string | undefined,
     ErrorStatus: boolean,
-    checkValidation: boolean,
+    checkValidation: boolean | undefined,
 }
 
-const Input:FC<InputProps>=({prop, clickFocus, clickBlur,clickInput, 
+const Input:FC<InputProps>=({prop, clickBlur,clickInput, 
                             ErrorDesctiption, ErrorStatus, InputValue,
                             checkValidation})=>{
     return(
@@ -21,8 +20,8 @@ const Input:FC<InputProps>=({prop, clickFocus, clickBlur,clickInput,
             {ErrorStatus && <span className={style.InputRegistration_warning}>{ErrorDesctiption}</span>}
             <input alt={prop?.alt} value={InputValue} onChange={(e)=>clickInput(e)}
                 placeholder={prop?.placeholder} onBlur={()=>clickBlur()}
-                className={style.InputRegistration_input + ' ' + (checkValidation ?  ' ' : style.InputRegistration_focus)}
-                key={prop?.id} type={prop?.type} onFocus={()=>clickFocus()}>
+                className={style.InputRegistration_input + ' ' + (!checkValidation ?  ' ' : style.InputRegistration_focus)}
+                key={prop?.id} type={prop?.type}>
             </input>
         </div>
     )

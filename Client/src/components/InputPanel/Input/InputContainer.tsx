@@ -1,121 +1,81 @@
 import { FC, useState , useCallback} from "react";
 import Input from "./Input";
 import { useTypedDispatch } from "../../../hooks/useTypedDispatch";
-import { ErrorValidationType, InputPanelType } from "../../../models/AuthTypes";
-import { setRegistrateEmail, 
-         setRegistrateName, setRegistratePassword, 
-         setRegistrateRepPassword, setRegistrateSurname } from "../../../redux/reducers/RegistrateReduce";
+import {  InputPanelType } from "../../../models/AuthTypes";
+import { checkEmail, checkEmpty, checkLengthWord, checkRepPassword, setRegistrateEmailValue, 
+         setRegistrateNameValue, setRegistratePasswordValue, 
+         setRegistrateRepPasswordValue, setRegistrateSurnameValue } from "../../../redux/reducers/RegistrateReduce";
 import { useTypedSelector } from "../../../hooks/useTypedSelector";
-import { setErrorValidation } from "../../../redux/reducers/AuthReducer";
 
 type InputProps = {
     prop: InputPanelType
 }
 
 const InputContainer:FC<InputProps> = ({prop}) =>{
-    const [isFocus, setIsFocus] = useState<boolean|null>(null)
     const [value, setValue] = useState<string>('')
-    const [Error, setError] = useState<ErrorValidationType>({status: false, description: ''})
-    const checkValidation = ((!isFocus || !!value) && !Error.status)
+    
     const dispatch = useTypedDispatch()
-    const {RegistrateRepPassword, RegistratePassword} = useTypedSelector(state=> state.Registrate)
 
-    const checkEmail = useCallback(()=>{
-        if(!(/\S+@\S+\.\S+/.test(value))){
-            setError({status: true ,description: 'Email is invalid'})
-            dispatch(setErrorValidation(true))
-        }
-        else{
-            setError({status: false ,description: ''})
-            dispatch(setErrorValidation(false))
-        }
-    },[value, dispatch])
-
-    const checkEmpty = useCallback(()=>{
-        if(value.length === 0){
-            setError({status: true, description:'Empty row'})
-            dispatch(setErrorValidation(true))
-        }
-        else{
-            setError({status: false ,description: ''})
-            dispatch(setErrorValidation(false))
-        }
-    },[value, dispatch])
-
-    const checkShortWord = useCallback((int:number)=>{
-        if(value.length <= int){
-            setError({status: true, description:`Password length less ${int}`})
-            dispatch(setErrorValidation(true))
-        }
-        else{
-            setError({status: false ,description: ''})
-            dispatch(setErrorValidation(false))
-        }
-    },[value, dispatch])
-
-    const checkRigthRepPassword = useCallback(()=>{
-        if(RegistratePassword !== RegistrateRepPassword){
-            setError({status:true,
-                      description:`Passwords are not the same`})
-            dispatch(setErrorValidation(true))
-        }
-        else{
-            setError({status: false ,description: ''})
-        }
-    },[RegistratePassword, RegistrateRepPassword, dispatch])
-
-    const clickFocus = () => {
-        setIsFocus(false)
-    }
-
+    const {RegistratePassword, RegistrateEmail, 
+           RegistrateName, RegistrateSurname} = useTypedSelector(state=> state.Registrate)
     const clickBlur = useCallback(()=>{
-        switch (prop.name){
+        switch (prop.elem?.name){
             case('email'):{
-                value.length ? checkEmail() : checkEmpty()
+                value.length ? dispatch(checkEmail()) : dispatch(checkEmpty(RegistrateEmail))
                 break
             }
             case('password'):{
-                value.length ? checkShortWord(5) : checkEmpty()
+                value.length ? dispatch(checkLengthWord({input:RegistratePassword,min:5})) :
+                               dispatch(checkEmpty(RegistratePassword))
                 break
             }
             case('reppassword'):{
-                checkRigthRepPassword()
+                dispatch(checkRepPassword())
                 break
             }
-            case('other'):{
-                value.length ? checkShortWord(2) : checkEmpty()
+            case('name'):{
+                value.length ?
+                     dispatch(checkLengthWord({input:RegistrateName,min:2})) : 
+                     dispatch(checkEmpty(RegistrateName))
+                break
+            }
+            case('surname'):{
+                value.length ?
+                     dispatch(checkLengthWord({input:RegistrateSurname,min:2})) : 
+                     dispatch(checkEmpty(RegistrateSurname))
                 break
             }
             default:{
-                setIsFocus(true)
+                
             }
         }
-    },[checkEmail,checkShortWord,checkEmpty,checkRigthRepPassword, prop.name, value])
+    },[prop.elem?.name, value.length, dispatch,
+         RegistrateEmail, RegistratePassword, RegistrateName, RegistrateSurname])
 
     const clickInput= useCallback((e: React.ChangeEvent<HTMLInputElement>)=>{
-        switch(prop.name){
+        switch(prop.elem?.name){
             case('email'):{
-                dispatch(setRegistrateEmail(e.target.value))
+                dispatch(setRegistrateEmailValue(e.target.value))
                 setValue(e.target.value)
                 break
             }
             case('password'):{
-                dispatch(setRegistratePassword(e.target.value))
+                dispatch(setRegistratePasswordValue(e.target.value))
                 setValue(e.target.value)
                 break
             }
             case('reppassword'):{
-                dispatch(setRegistrateRepPassword(e.target.value))
+                dispatch(setRegistrateRepPasswordValue(e.target.value))
                 setValue(e.target.value)
                 break
             }
             case('name'):{
-                dispatch(setRegistrateName(e.target.value))
+                dispatch(setRegistrateNameValue(e.target.value))
                 setValue(e.target.value)
                 break
             }
             case('surname'):{
-                dispatch(setRegistrateSurname(e.target.value))
+                dispatch(setRegistrateSurnameValue(e.target.value))
                 setValue(e.target.value)
                 break
             }
@@ -123,13 +83,13 @@ const InputContainer:FC<InputProps> = ({prop}) =>{
                 setValue(e.target.value)
             }
         }
-        !!value ? setIsFocus(true) : setIsFocus(false)
-    },[value,prop.name, dispatch])
+    },[prop.elem?.name, dispatch])
 
     return(
-        <Input prop={prop} checkValidation={checkValidation} ErrorStatus={Error.status}
-                 clickBlur={clickBlur} clickFocus={clickFocus} clickInput={clickInput}
-                 ErrorDesctiption={Error.description} InputValue={value}/>
+        <Input prop={prop} checkValidation={prop.elem?.isFocus} 
+               ErrorStatus={prop.elem?.state === "Error"} clickBlur={clickBlur}
+               clickInput={clickInput} ErrorDesctiption={prop.elem?.description} 
+               InputValue={prop.elem?.value ||value}/>
     )
 }
 
