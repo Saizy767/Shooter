@@ -2,7 +2,7 @@ import { FC, useState , useCallback} from "react";
 import Input from "./Input";
 import { useTypedDispatch } from "../../../hooks/useTypedDispatch";
 import {  InputPanelType } from "../../../models/AuthTypes";
-import { checkEmail, checkEmpty, checkLengthWord, checkRepPassword, setRegistrateEmailValue, 
+import { checkInvalidEmail, checkEmpty, checkLengthWord, checkRepPassword, setRegistrateEmailValue, 
          setRegistrateNameValue, setRegistratePasswordValue, 
          setRegistrateRepPasswordValue, setRegistrateSurnameValue } from "../../../redux/reducers/RegistrateReduce";
 import { useTypedSelector } from "../../../hooks/useTypedSelector";
@@ -21,7 +21,8 @@ const InputContainer:FC<InputProps> = ({prop}) =>{
     const clickBlur = useCallback(()=>{
         switch (prop.elem?.name){
             case('email'):{
-                value.length ? dispatch(checkEmail()) : dispatch(checkEmpty(RegistrateEmail))
+                value.length && dispatch(checkEmpty(RegistrateEmail))
+                dispatch(checkInvalidEmail())
                 break
             }
             case('password'):{

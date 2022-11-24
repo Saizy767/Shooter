@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit'
 import { stateInputType } from '../../models/AuthTypes';
 import { RootState } from '../rootReducer';
-import { PostData } from './APIReducer';
+import { GetData, PostData } from './APIReducer';
 import { setAnyOneFocus, setErrorValidation, setNextStepRegistration, setTimer, setVisibilityRegistration } from './AuthReducer';
 
 type RegistrateType = {
@@ -101,23 +101,85 @@ export const registrateSlice = createSlice({
     }
 })
 
-export const checkEmail = createAsyncThunk(
-    'registration/checkEmail',
+export const checkInvalidEmail = createAsyncThunk(
+    'registration/checkInvalidEmail',
     async(_,{dispatch, getState})=>{
         const selector = getState() as RootState
         const value = selector.Registrate.RegistrateEmail.value
-        if(!(/\S+@\S+\.\S+/.test(value))){
+        const tester = /^[-!#$%&'*+\\/0-9=?A-Z^_a-z`{|}~](\.?[-!#$%&'*+\\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
+
+            const emailParts = value.split('@');
+
+            if(emailParts.length !== 2) {
+                dispatch(setCheckForAll({value, state: "Error",
+                                         description: 'Email is invalid', name: 'email',
+                                         isFocus:true}))
+                dispatch(setAnyOneFocus(true))
+            }
+
+            const account = emailParts[0];
+            const address = emailParts[1];
+
+            if(account.length > 64){
+                dispatch(setCheckForAll({value, state: "Error",
+                                        description: 'Email is invalid', name: 'email',
+                                        isFocus:true}))
+                dispatch(setAnyOneFocus(true))
+            }
+
+            else if(address.length > 255){
+                dispatch(setCheckForAll({value, state: "Error",
+                                        description: 'Email is invalid', name: 'email',
+                                        isFocus:true}))
+                dispatch(setAnyOneFocus(true))
+            }
+
+            const domainParts = address.split('.');
+            if (domainParts.some(function (part) {
+                return part.length > 63;
+            }))
             dispatch(setCheckForAll({value, state: "Error",
-                                     description: 'Email is invalid', name: 'email',
+                                    description: 'Email is invalid', name: 'email',
+                                    isFocus:true}))
+            dispatch(setAnyOneFocus(true))
+
+
+            if (!tester.test(value)){
+                dispatch(setCheckForAll({value, state: "Error",
+                                        description: 'Email is invalid', name: 'email',
+                                        isFocus:true}))
+                dispatch(setAnyOneFocus(true))
+            };
+
+            return [dispatch(setCheckForAll({value, state: "Success",
+                                            description: '', name: 'email',
+                                            isFocus:false})),
+                dispatch(checkExistingEmail({email: value}))]
+        })
+
+export const checkExistingEmail = createAsyncThunk(
+    'registration/checkExistingEmail',
+    async({email}:{email:string},{dispatch, getState})=>{
+        const selector = getState() as RootState
+        const value = selector.Registrate.RegistrateEmail.value
+        const result = await dispatch(GetData(
+            {
+                url: `${process.env.REACT_APP_SERVER_HOST}/user/${email}` || '',
+            }
+        ))
+        if(result.payload[0].email === email){
+            dispatch(setCheckForAll({value, state: "Error",
+                                     description: 'Email is existing', name: 'email',
                                      isFocus:true}))
             dispatch(setAnyOneFocus(true))
         }
         else{
             dispatch(setCheckForAll({value, state: "Success",
-                                     description: '',name: 'email',
+                                     description: '', name: 'email',
                                      isFocus:false}))
         }
-})
+    }
+)
 
 export const checkEmpty = createAsyncThunk(
     'registration/emptyInput',
@@ -171,7 +233,7 @@ export const checkRepPassword = createAsyncThunk(
 
 export const clickNextStepRegistration = createAsyncThunk(
     'registrate/nextpage',
-    async(stateButton:any,{dispatch, getState})=>{
+    async({stateButton, email}:{stateButton:boolean, email: string},{dispatch, getState})=>{
         const selector = getState() as RootState
         const {RegistrateName, RegistrateSurname, RegistrateEmail,
                RegistratePassword} = selector.Registrate
@@ -180,13 +242,14 @@ export const clickNextStepRegistration = createAsyncThunk(
         if(stateButton){
             switch(CurrentStepRegistration){
                 case(0):{
+                    dispatch(checkExistingEmail({email}))
                     dispatch(setNextStepRegistration())
                     break
                 }
                 case(1):{
                     dispatch(PostData(
                         {
-                            url:process.env.REACT_APP_USER_REGISTRATION || '',
+                            url:`${process.env.REACT_APP_SERVER_HOST}/user/registration` || '',
                             data:{RegistrateName, RegistrateSurname, RegistrateEmail, RegistratePassword}
                         }
                     ))

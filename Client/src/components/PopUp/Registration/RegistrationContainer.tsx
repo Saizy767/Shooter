@@ -1,7 +1,7 @@
-import { FC, useEffect } from "react";
+import { FC, useCallback, useEffect } from "react";
 import { useTypedDispatch } from "../../../hooks/useTypedDispatch";
 import { useTypedSelector } from "../../../hooks/useTypedSelector";
-import { ButtonPanelType, InputPanelType, stepsType } from "../../../models/AuthTypes";
+import { ButtonPanelType, InputPanelType, stateInputType, stepsType } from "../../../models/AuthTypes";
 import { clickToRegistration, setPrevStepRegistration, setTimer } from "../../../redux/reducers/AuthReducer";
 import { clickCompleteRegistration, clickNextStepRegistration} from "../../../redux/reducers/RegistrateReduce";
 import Registration from "./Registration";
@@ -12,22 +12,22 @@ const RegistrationContainer:FC=()=>{
     const {RegistrateEmail, RegistratePassword, RegistrateName, 
            RegistrateRepPassword, RegistrateSurname} = useTypedSelector((state)=> state.Registrate)
 
-    //change
-    const initial = true
-    const First = [RegistrateEmail, RegistrateName, RegistrateSurname].reduce((acc, cur)=>
-        (((acc && !cur.isFocus) && (acc && !!cur.value)))&&(acc && !(cur.state === 'Error'))
-        , initial)
-    const Second = [RegistratePassword, RegistrateRepPassword].reduce((acc, cur)=>
-    (((acc && !cur.isFocus) && (acc && !!cur.value)))&&(acc && !(cur.state === 'Error'))
-    , initial)
-    //
 
-    const TimerButton: ButtonPanelType = {
-        id:1,
-        name: "Send Again",
-        onClick: () => dispatch(setTimer(20)),
-        typeMessage: 'Warning'
-    }
+    const arrayReduce = useCallback((array:Array<stateInputType>) =>{
+        return array.reduce((acc, cur)=>
+        (((acc && !cur.isFocus) && (acc && !!cur.value)))&&(acc && !(cur.state === 'Error'))
+        , true)
+    },[])
+
+    const checkFirstPage = arrayReduce([RegistrateEmail,RegistrateName, RegistrateSurname])
+    const checkSecondPage = arrayReduce([RegistratePassword, RegistrateRepPassword])
+
+    useEffect(()=>{
+        setTimeout(()=>{
+            CurrentStepRegistration === 2 && Timer && dispatch(setTimer(Timer-1))
+        },1000)
+    },[dispatch, CurrentStepRegistration, Timer])
+
     const ButtonPanelData:ButtonPanelType[] = [
         {
             id: 1,
@@ -41,13 +41,20 @@ const RegistrationContainer:FC=()=>{
             name: CurrentStepRegistration === 2 ? "Complete" : "Next",
             onClick: CurrentStepRegistration === 2 ? ()=>dispatch(clickCompleteRegistration()) : 
                                                      ()=>dispatch(clickNextStepRegistration(
-                                                        CurrentStepRegistration === 0 ?
-                                                        First : Second
-                                                         )),
-            typeMessage: (CurrentStepRegistration === 0 ?
-                First: Second) ? 'Ok': 'Not'
+                                                        {stateButton:
+                                                            CurrentStepRegistration === 0 ?
+                                                            checkFirstPage : checkSecondPage,
+                                                        email: RegistrateEmail.value})),
+            typeMessage: (CurrentStepRegistration === 0 ? checkFirstPage : checkSecondPage)
+                ? 'Ok': 'Not'
         }
     ]
+    const TimerButton: ButtonPanelType = {
+        id:3,
+        name: "Send Again",
+        onClick: () => dispatch(setTimer(20)),
+        typeMessage: 'Warning'
+    }
     const steps: stepsType = {
         firstStep: 0,
         secondStep: 1,
@@ -104,12 +111,6 @@ const RegistrationContainer:FC=()=>{
 
     const InputPanelData = CurrentStepRegistration === 0 ? FirstInputPanelData : 
                            CurrentStepRegistration === 1 ? SecondInputPanelData : ThirdInputPanelData
-    
-    useEffect(()=>{
-        setTimeout(()=>{
-            CurrentStepRegistration === 2 && Timer && dispatch(setTimer(Timer-1))
-        },1000)
-    },[dispatch, CurrentStepRegistration, Timer])
     
     return(
         <Registration step={CurrentStepRegistration} steps={steps} 
