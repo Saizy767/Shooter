@@ -42,3 +42,4 @@ export const IconPanel: IconPanelType[] =[
         img: OdnoklassnikiLogo
     }
 ]
+

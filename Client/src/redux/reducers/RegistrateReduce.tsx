@@ -55,21 +55,6 @@ export const registrateSlice = createSlice({
     initialState,
     reducers:
     {
-        setRegistrateNameValue:(state, action:PayloadAction<string>)=>{
-            state.RegistrateName.value = action.payload
-        },
-        setRegistrateSurnameValue:(state, action:PayloadAction<string>)=>{
-            state.RegistrateSurname.value = action.payload
-        },
-        setRegistratePasswordValue:(state, action:PayloadAction<string>)=>{
-            state.RegistratePassword.value = action.payload
-        },
-        setRegistrateRepPasswordValue:(state, action:PayloadAction<string>)=>{
-            state.RegistrateRepPassword.value = action.payload
-        },
-        setRegistrateEmailValue:(state, action:PayloadAction<string>)=>{
-            state.RegistrateEmail.value = action.payload
-        },
         setCheckForAll:(state, action:PayloadAction<stateInputType>)=>{
             switch(action.payload.name){
                 case('email'):{
@@ -105,13 +90,16 @@ export const checkInvalidEmail = createAsyncThunk(
     'registration/checkInvalidEmail',
     async(_,{dispatch, getState})=>{
         const selector = getState() as RootState
-        const value = selector.Registrate.RegistrateEmail.value
+        const {RegistrateEmail} = selector.Registrate
         const tester = /^[-!#$%&'*+\\/0-9=?A-Z^_a-z`{|}~](\.?[-!#$%&'*+\\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
 
-            const emailParts = value.split('@');
+            const emailParts = RegistrateEmail.value.split('@');
+            if(!RegistrateEmail.value){
+                return dispatch(checkEmpty(RegistrateEmail))
+            }
 
             if(emailParts.length !== 2) {
-                dispatch(setCheckForAll({value, state: "Error",
+                dispatch(setCheckForAll({value:RegistrateEmail.value, state: "Error",
                                          description: 'Email is invalid', name: 'email',
                                          isFocus:true}))
                 dispatch(setAnyOneFocus(true))
@@ -121,14 +109,14 @@ export const checkInvalidEmail = createAsyncThunk(
             const address = emailParts[1];
 
             if(account.length > 64){
-                dispatch(setCheckForAll({value, state: "Error",
+                dispatch(setCheckForAll({value:RegistrateEmail.value, state: "Error",
                                         description: 'Email is invalid', name: 'email',
                                         isFocus:true}))
                 dispatch(setAnyOneFocus(true))
             }
 
             else if(address.length > 255){
-                dispatch(setCheckForAll({value, state: "Error",
+                dispatch(setCheckForAll({value:RegistrateEmail.value, state: "Error",
                                         description: 'Email is invalid', name: 'email',
                                         isFocus:true}))
                 dispatch(setAnyOneFocus(true))
@@ -138,23 +126,23 @@ export const checkInvalidEmail = createAsyncThunk(
             if (domainParts.some(function (part) {
                 return part.length > 63;
             }))
-            dispatch(setCheckForAll({value, state: "Error",
+            dispatch(setCheckForAll({value:RegistrateEmail.value, state: "Error",
                                     description: 'Email is invalid', name: 'email',
                                     isFocus:true}))
             dispatch(setAnyOneFocus(true))
 
 
-            if (!tester.test(value)){
-                dispatch(setCheckForAll({value, state: "Error",
+            if (!tester.test(RegistrateEmail.value)){
+                dispatch(setCheckForAll({value:RegistrateEmail.value, state: "Error",
                                         description: 'Email is invalid', name: 'email',
                                         isFocus:true}))
                 dispatch(setAnyOneFocus(true))
             };
 
-            return [dispatch(setCheckForAll({value, state: "Success",
+            return [dispatch(setCheckForAll({value:RegistrateEmail.value, state: "Success",
                                             description: '', name: 'email',
                                             isFocus:false})),
-                dispatch(checkExistingEmail({email: value}))]
+                dispatch(checkExistingEmail({email: RegistrateEmail.value}))]
         })
 
 export const checkExistingEmail = createAsyncThunk(
@@ -200,7 +188,10 @@ export const checkEmpty = createAsyncThunk(
 export const checkLengthWord = createAsyncThunk(
     'registration/inputLength',
     async({input,min}:{input:stateInputType, min: number},{dispatch})=>{
-    if(input.value.length <= min){
+    if(!input.value){
+        return dispatch(checkEmpty(input))
+    }
+    else if(input.value.length <= min){
         dispatch(setCheckForAll({value: input.value,state: "Error",
                                  description:`Password length less ${min}`, name:input.name,
                                  isFocus: true}))
@@ -231,9 +222,17 @@ export const checkRepPassword = createAsyncThunk(
         }
 })
 
+export const setInputValue = createAsyncThunk(
+    'registration/inputValue',
+    async({input, value}:{input:stateInputType, value:string}, {dispatch})=>{
+        const { description, state, isFocus, name} = input
+        dispatch(setCheckForAll({value,description, state, isFocus, name }))
+    }
+)
+
 export const clickNextStepRegistration = createAsyncThunk(
     'registrate/nextpage',
-    async({stateButton, email}:{stateButton:boolean, email: string},{dispatch, getState})=>{
+    async({stateButton}:{stateButton:boolean},{dispatch, getState})=>{
         const selector = getState() as RootState
         const {RegistrateName, RegistrateSurname, RegistrateEmail,
                RegistratePassword} = selector.Registrate
@@ -242,7 +241,6 @@ export const clickNextStepRegistration = createAsyncThunk(
         if(stateButton){
             switch(CurrentStepRegistration){
                 case(0):{
-                    dispatch(checkExistingEmail({email}))
                     dispatch(setNextStepRegistration())
                     break
                 }
@@ -272,8 +270,6 @@ export const clickCompleteRegistration = createAsyncThunk(
 )
 
 
-export const {setRegistrateEmailValue, setRegistrateNameValue, setRegistratePasswordValue,
-              setRegistrateRepPasswordValue, setRegistrateSurnameValue, setCheckForAll
-             } = registrateSlice.actions
+export const {setCheckForAll} = registrateSlice.actions
 export default registrateSlice
 

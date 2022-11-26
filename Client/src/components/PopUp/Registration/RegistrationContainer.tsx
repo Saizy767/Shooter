@@ -44,7 +44,7 @@ const RegistrationContainer:FC=()=>{
                                                         {stateButton:
                                                             CurrentStepRegistration === 0 ?
                                                             checkFirstPage : checkSecondPage,
-                                                        email: RegistrateEmail.value})),
+                                                        })),
             typeMessage: (CurrentStepRegistration === 0 ? checkFirstPage : checkSecondPage)
                 ? 'Ok': 'Not'
         }

@@ -5,14 +5,16 @@ import bd from '../database/db'
 class UserController{
     async registrateUser(req: Request,res: Response){
         const {RegistrateName, RegistrateSurname, RegistrateEmail, RegistratePassword} = req.body
-        const favorites:CoctailType[] = []
-        const homebar:ingredientType[] = []
-        const isActivated:boolean = false
         const newPerson = await bd.query(
             `INSERT INTO person (name, surname, favorites, homebar, password, email, isActivated)
              VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
-            [RegistrateName, RegistrateSurname, favorites, homebar, RegistratePassword, RegistrateEmail, isActivated])
+            [RegistrateName, RegistrateSurname, [], [], RegistratePassword, RegistrateEmail, false])
         res.json(newPerson.rows)
+    }
+    async getLogin(req:Request, res: Response ){
+        const email = req.params.email
+        const findEmail = await bd.query(`select email from person where email = $1`,[email])
+        res.json(findEmail.rows)
     }
     async getUsers(req: Request,res: Response){
         const users = await bd.query(`select * from person`)
@@ -21,12 +23,12 @@ class UserController{
     async deleteUser(req: Request,res: Response){
         const id = req.params.id
         const user = await bd.query('delete from person where id = $1',[id])
-        res.json(user.rows[0])
+        res.json(user.rows)
     }
     async getOneUser(req: Request,res: Response){
         const id = req.params.id
         const user = await bd.query(`select * from person where id = $1`,[id])
-        res.json(user.rows[0])
+        res.json(user.rows)
     }
     async updateUser(req: Request,res: Response){
         const id = req.params.id

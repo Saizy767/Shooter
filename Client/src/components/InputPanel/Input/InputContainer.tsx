@@ -2,9 +2,8 @@ import { FC, useState , useCallback} from "react";
 import Input from "./Input";
 import { useTypedDispatch } from "../../../hooks/useTypedDispatch";
 import {  InputPanelType } from "../../../models/AuthTypes";
-import { checkInvalidEmail, checkEmpty, checkLengthWord, checkRepPassword, setRegistrateEmailValue, 
-         setRegistrateNameValue, setRegistratePasswordValue, 
-         setRegistrateRepPasswordValue, setRegistrateSurnameValue } from "../../../redux/reducers/RegistrateReduce";
+import { checkInvalidEmail, checkLengthWord, 
+        checkRepPassword, setInputValue } from "../../../redux/reducers/RegistrateReduce";
 import { useTypedSelector } from "../../../hooks/useTypedSelector";
 
 type InputProps = {
@@ -16,18 +15,17 @@ const InputContainer:FC<InputProps> = ({prop}) =>{
     
     const dispatch = useTypedDispatch()
 
-    const {RegistratePassword, RegistrateEmail, 
+    const {RegistratePassword, 
            RegistrateName, RegistrateSurname} = useTypedSelector(state=> state.Registrate)
+           
     const clickBlur = useCallback(()=>{
         switch (prop.elem?.name){
             case('email'):{
-                value.length && dispatch(checkEmpty(RegistrateEmail))
                 dispatch(checkInvalidEmail())
                 break
             }
             case('password'):{
-                value.length ? dispatch(checkLengthWord({input:RegistratePassword,min:5})) :
-                               dispatch(checkEmpty(RegistratePassword))
+                dispatch(checkLengthWord({input:RegistratePassword,min:5})) 
                 break
             }
             case('reppassword'):{
@@ -35,56 +33,23 @@ const InputContainer:FC<InputProps> = ({prop}) =>{
                 break
             }
             case('name'):{
-                value.length ?
-                     dispatch(checkLengthWord({input:RegistrateName,min:2})) : 
-                     dispatch(checkEmpty(RegistrateName))
+                dispatch(checkLengthWord({input:RegistrateName,min:2}))
                 break
             }
             case('surname'):{
-                value.length ?
-                     dispatch(checkLengthWord({input:RegistrateSurname,min:2})) : 
-                     dispatch(checkEmpty(RegistrateSurname))
+                dispatch(checkLengthWord({input:RegistrateSurname,min:2}))
                 break
             }
             default:{
-                
+                break
             }
         }
-    },[prop.elem?.name, value.length, dispatch,
-         RegistrateEmail, RegistratePassword, RegistrateName, RegistrateSurname])
+    },[prop.elem?.name, dispatch, RegistratePassword, RegistrateName, RegistrateSurname])
 
     const clickInput= useCallback((e: React.ChangeEvent<HTMLInputElement>)=>{
-        switch(prop.elem?.name){
-            case('email'):{
-                dispatch(setRegistrateEmailValue(e.target.value))
-                setValue(e.target.value)
-                break
-            }
-            case('password'):{
-                dispatch(setRegistratePasswordValue(e.target.value))
-                setValue(e.target.value)
-                break
-            }
-            case('reppassword'):{
-                dispatch(setRegistrateRepPasswordValue(e.target.value))
-                setValue(e.target.value)
-                break
-            }
-            case('name'):{
-                dispatch(setRegistrateNameValue(e.target.value))
-                setValue(e.target.value)
-                break
-            }
-            case('surname'):{
-                dispatch(setRegistrateSurnameValue(e.target.value))
-                setValue(e.target.value)
-                break
-            }
-            default:{
-                setValue(e.target.value)
-            }
-        }
-    },[prop.elem?.name, dispatch])
+        prop.elem && dispatch(setInputValue({input:prop.elem, value: e.target.value}))
+        setValue(e.target.value)
+    },[dispatch, prop.elem])
 
     return(
         <Input prop={prop} checkValidation={prop.elem?.isFocus} 
