@@ -10,7 +10,8 @@ import Auth from "./Auth";
 
 const AuthContainer:FC = () =>{
     const dispatch = useTypedDispatch()
-    const {ErrorValidation, AuthorizationEmail, AuthorizationPassword} = useTypedSelector(state=> state.Auth)
+    const {ErrorValidation} = useTypedSelector(state=> state.Auth)
+    const {AuthorizationEmail, AuthorizationPassword} = useTypedSelector(state=> state.Registrate)
 
     const ButtonPanelData: ButtonPanelType[] = [
         {name: 'Registration',

@@ -10,7 +10,7 @@ type InputProps = {
 
 const InputContainer:FC<InputProps> = ({prop}) =>{
     const dispatch = useTypedDispatch()
-
+    
     const clickBlur = useCallback(()=>{
         return dispatch(checkInputRule({args: [prop]}));
     },[prop, dispatch])

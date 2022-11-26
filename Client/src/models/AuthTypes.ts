@@ -24,10 +24,10 @@ export type stepsType = {
 }
 export type stateInputType = {
     value: string,
-    type: 'text' | 'password',
+    typeInput: 'text' | 'password',
     state: "Error" | "Success",
     description: string,
     name: string,
     isFocus: boolean,
-    placeholder:string
+    placeholder:string,
 }

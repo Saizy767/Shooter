@@ -1,5 +1,4 @@
 import { AnyAction, createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit'
-import { stateInputType } from '../../models/AuthTypes'
 
 type AuthModule = {
     visibilityAuth: boolean,
@@ -8,8 +7,6 @@ type AuthModule = {
     AnyOneFocus: boolean
     Timer: number,
     CurrentStepRegistration: number,
-    AuthorizationEmail: stateInputType,
-    AuthorizationPassword: stateInputType
 }
 
 const initialState:AuthModule = {
@@ -19,25 +16,6 @@ const initialState:AuthModule = {
     AnyOneFocus: false,
     Timer: 0,
     CurrentStepRegistration: 0,
-
-    AuthorizationEmail:{
-        value: '',
-        state: 'Success',
-        description: '',
-        name: 'email',
-        type: 'text',
-        isFocus: false,
-        placeholder: 'E-mail'
-    },
-    AuthorizationPassword: {
-        value: '',
-        state: 'Success',
-        description: '',
-        name: 'password',
-        type: 'password',
-        isFocus: false,
-        placeholder: 'Password'
-    }
 }
 
 export const authSlice = createSlice({

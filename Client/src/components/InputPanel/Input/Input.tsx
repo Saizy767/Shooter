@@ -24,11 +24,11 @@ const Input:FC<InputProps>=({prop, clickBlur,clickInput,
                 placeholder={prop?.placeholder} onBlur={()=>clickBlur()}
                 className={style.InputRegistration_input + ' ' +
                         (!checkValidation ?  ' ' : style.InputRegistration_focus)}
-                type={prop?.type}>
+                type={prop?.typeInput}>
             </input>
-            {(prop.name === 'reppassword' || prop.name === 'password') &&
+            {prop.value && (prop.name === 'reppassword' || prop.name === 'password') &&
                 <div className={style.PasswordEye}>
-                    {prop.type === 'password' ?
+                    {prop.typeInput === 'password' ?
                          <AiOutlineEye className={style.PasswordEye_icon} onClick={()=>clickEyeIcon('text')}/> :
                          <AiOutlineEyeInvisible className={style.PasswordEye_icon} onClick={()=>clickEyeIcon('password')}/>}
                 </div> } 
