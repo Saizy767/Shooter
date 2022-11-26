@@ -222,6 +222,39 @@ export const checkRepPassword = createAsyncThunk(
         }
 })
 
+export const checkInputRule = createAsyncThunk(
+    'registration/checkInputRule',
+    async({...args}: {args:Array<stateInputType>},{dispatch,getState})=>{
+        const selector = getState() as RootState
+        const {RegistratePassword, RegistrateName, RegistrateSurname} = selector.Registrate
+        for(let i = 0;i<= args.args.length; i++){
+            switch (args.args[i].name){
+                case('email'):{
+                    dispatch(checkInvalidEmail())
+                    break
+                }
+                case('password'):{
+                    dispatch(checkLengthWord({input:RegistratePassword,min:5})) 
+                    break
+                }
+                case('reppassword'):{
+                    dispatch(checkRepPassword())
+                    break
+                }
+                case('name'):{
+                    dispatch(checkLengthWord({input:RegistrateName,min:2}))
+                    break
+                }
+                case('surname'):{
+                    dispatch(checkLengthWord({input:RegistrateSurname,min:2}))
+                    break
+                }
+            }
+
+        }
+    }
+)
+
 export const setInputValue = createAsyncThunk(
     'registration/inputValue',
     async({input, value}:{input:stateInputType, value:string}, {dispatch})=>{
@@ -235,31 +268,33 @@ export const clickNextStepRegistration = createAsyncThunk(
     async({stateButton}:{stateButton:boolean},{dispatch, getState})=>{
         const selector = getState() as RootState
         const {RegistrateName, RegistrateSurname, RegistrateEmail,
-               RegistratePassword} = selector.Registrate
+               RegistratePassword, RegistrateRepPassword} = selector.Registrate
         const {CurrentStepRegistration} = selector.Auth
         dispatch(setErrorValidation(stateButton))
-        if(stateButton){
             switch(CurrentStepRegistration){
                 case(0):{
-                    dispatch(setNextStepRegistration())
+                    dispatch(checkInputRule({args:[RegistrateEmail, RegistrateName, RegistrateSurname]}))
+                    stateButton && dispatch(setNextStepRegistration())
                     break
                 }
                 case(1):{
-                    dispatch(PostData(
-                        {
-                            url:`${process.env.REACT_APP_SERVER_HOST}/user/registration` || '',
-                            data:{RegistrateName, RegistrateSurname, RegistrateEmail, RegistratePassword}
-                        }
-                    ))
-                    dispatch(setTimer(30))
-                    dispatch(setNextStepRegistration())
+                    dispatch(checkInputRule({args:[RegistratePassword, RegistrateRepPassword]}))
+                    if(stateButton){
+                        dispatch(PostData(
+                            {
+                                url:`${process.env.REACT_APP_SERVER_HOST}/user/registration` || '',
+                                data:{RegistrateName, RegistrateSurname, RegistrateEmail, RegistratePassword}
+                            }
+                        ))
+                        dispatch(setNextStepRegistration())
+                        dispatch(setTimer(30))
+                    }
                     break
                 }
                 default:{
-                    dispatch(setNextStepRegistration())
+                    stateButton && dispatch(setNextStepRegistration())
                 }
         }}
-    }
 )
 
 export const clickCompleteRegistration = createAsyncThunk(

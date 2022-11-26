@@ -40,11 +40,11 @@ const RegistrationContainer:FC=()=>{
             id:2, 
             name: CurrentStepRegistration === 2 ? "Complete" : "Next",
             onClick: CurrentStepRegistration === 2 ? ()=>dispatch(clickCompleteRegistration()) : 
-                                                     ()=>dispatch(clickNextStepRegistration(
+                                                     ()=>[dispatch(clickNextStepRegistration(
                                                         {stateButton:
                                                             CurrentStepRegistration === 0 ?
                                                             checkFirstPage : checkSecondPage,
-                                                        })),
+                                                        }))],
             typeMessage: (CurrentStepRegistration === 0 ? checkFirstPage : checkSecondPage)
                 ? 'Ok': 'Not'
         }
