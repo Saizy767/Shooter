@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { ButtonPanelType, InputPanelType, stepsType } from "../../../models/AuthTypes";
+import { ButtonPanelType, stateInputType, stepsType } from "../../../models/AuthTypes";
 import InputPanel from "../../InputPanel/InputPanel";
 import PopUpAuth from "../PopUpAuth";
 import style from './Registration.module.scss'
@@ -10,7 +10,7 @@ type RegistrationProps = {
     step: number,
     steps: stepsType,
     ButtonPanelData: ButtonPanelType[],
-    InputPanelData: InputPanelType[],
+    InputPanelData: stateInputType[],
     TimerButtonProps: ButtonPanelType,
     timer: number
 }

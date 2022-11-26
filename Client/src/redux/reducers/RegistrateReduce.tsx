@@ -10,6 +10,7 @@ type RegistrateType = {
     RegistrateSurname: stateInputType,
     RegistratePassword: stateInputType,
     RegistrateRepPassword: stateInputType,
+    RegistrateCode: stateInputType
 }
 
 const initialState:RegistrateType = {
@@ -18,36 +19,55 @@ const initialState:RegistrateType = {
         state: 'Success',
         description: '',
         name: 'email',
-        isFocus: false
+        type: 'text',
+        isFocus: false,
+        placeholder: 'E-mail'
     },
     RegistrateName:{
         value: '',
         state: 'Success',
         description: '',
         name: 'name',
-        isFocus: false
+        type: 'text',
+        isFocus: false,
+        placeholder: 'Name'
     },
     RegistrateSurname: {
         value: '',
         state: 'Success',
         description: '',
         name: 'surname',
-        isFocus: false
+        type: 'text',
+        isFocus: false,
+        placeholder: 'Surname'
     },
     RegistratePassword: {
         value: '',
         state: 'Success',
         description: '',
         name: 'password',
-        isFocus: false
+        type: 'password',
+        isFocus: false,
+        placeholder: 'Password'
     },
     RegistrateRepPassword:{
         value: '',
         state: 'Success',
         description: '',
         name: 'reppassword',
-        isFocus: false
+        type: 'password',
+        isFocus: false,
+        placeholder: 'Repeat Password'
     },
+    RegistrateCode:{
+        value: '',
+        state: 'Success',
+        description: '',
+        name: 'code',
+        type: 'text',
+        isFocus: false,
+        placeholder: 'Code'
+    }
 }
 
 export const registrateSlice = createSlice({
@@ -91,80 +111,83 @@ export const checkInvalidEmail = createAsyncThunk(
     async(_,{dispatch, getState})=>{
         const selector = getState() as RootState
         const {RegistrateEmail} = selector.Registrate
+        const {value, type, placeholder} = RegistrateEmail
         const tester = /^[-!#$%&'*+\\/0-9=?A-Z^_a-z`{|}~](\.?[-!#$%&'*+\\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
 
-            const emailParts = RegistrateEmail.value.split('@');
-            if(!RegistrateEmail.value){
+        const ErrorInput = () => {
+            dispatch(setCheckForAll({value, state: "Error",
+                                         description: 'Email is invalid', name: 'email',
+                                         isFocus:true, type, placeholder}))
+            dispatch(setAnyOneFocus(true))
+        }
+        const SuccessInput = () => {
+            dispatch(setCheckForAll({value, state: "Success",
+                                            description: '', name: 'email',
+                                            isFocus:false, type, placeholder}))
+            dispatch(checkExistingEmail({email: value}))
+        }
+
+
+            const emailParts = value.split('@');
+            if(!value){
                 return dispatch(checkEmpty(RegistrateEmail))
             }
 
             if(emailParts.length !== 2) {
-                dispatch(setCheckForAll({value:RegistrateEmail.value, state: "Error",
-                                         description: 'Email is invalid', name: 'email',
-                                         isFocus:true}))
-                dispatch(setAnyOneFocus(true))
+                return ErrorInput()
             }
 
             const account = emailParts[0];
             const address = emailParts[1];
 
             if(account.length > 64){
-                dispatch(setCheckForAll({value:RegistrateEmail.value, state: "Error",
-                                        description: 'Email is invalid', name: 'email',
-                                        isFocus:true}))
-                dispatch(setAnyOneFocus(true))
+                return ErrorInput()
             }
 
             else if(address.length > 255){
-                dispatch(setCheckForAll({value:RegistrateEmail.value, state: "Error",
-                                        description: 'Email is invalid', name: 'email',
-                                        isFocus:true}))
-                dispatch(setAnyOneFocus(true))
+                return ErrorInput()
             }
 
             const domainParts = address.split('.');
             if (domainParts.some(function (part) {
                 return part.length > 63;
             }))
-            dispatch(setCheckForAll({value:RegistrateEmail.value, state: "Error",
-                                    description: 'Email is invalid', name: 'email',
-                                    isFocus:true}))
-            dispatch(setAnyOneFocus(true))
+            return ErrorInput()
 
 
             if (!tester.test(RegistrateEmail.value)){
-                dispatch(setCheckForAll({value:RegistrateEmail.value, state: "Error",
-                                        description: 'Email is invalid', name: 'email',
-                                        isFocus:true}))
-                dispatch(setAnyOneFocus(true))
+                return ErrorInput()
             };
 
-            return [dispatch(setCheckForAll({value:RegistrateEmail.value, state: "Success",
-                                            description: '', name: 'email',
-                                            isFocus:false})),
-                dispatch(checkExistingEmail({email: RegistrateEmail.value}))]
+            return SuccessInput()
         })
 
 export const checkExistingEmail = createAsyncThunk(
     'registration/checkExistingEmail',
     async({email}:{email:string},{dispatch, getState})=>{
         const selector = getState() as RootState
-        const value = selector.Registrate.RegistrateEmail.value
+        const {value, type, placeholder} = selector.Registrate.RegistrateEmail
         const result = await dispatch(GetData(
             {
                 url: `${process.env.REACT_APP_SERVER_HOST}/user/${email}` || '',
             }
         ))
-        if(result.payload[0].email === email){
+        const ErrorInput = () =>{
             dispatch(setCheckForAll({value, state: "Error",
                                      description: 'Email is existing', name: 'email',
-                                     isFocus:true}))
+                                     isFocus:true, type, placeholder}))
             dispatch(setAnyOneFocus(true))
         }
-        else{
+        const SuccessInput = () => {
             dispatch(setCheckForAll({value, state: "Success",
                                      description: '', name: 'email',
-                                     isFocus:false}))
+                                     isFocus:false, type, placeholder}))
+        }
+        if(result.payload[0].email === email){
+            return ErrorInput()
+        }
+        else{
+            return SuccessInput()
         }
     }
 )
@@ -172,36 +195,55 @@ export const checkExistingEmail = createAsyncThunk(
 export const checkEmpty = createAsyncThunk(
     'registration/emptyInput',
     async(input:stateInputType,{dispatch})=>{
-    if(input.value.length === 0){
-        dispatch(setCheckForAll({value:input.value, state: "Error",
-                                 description:'Empty row', name: input.name,
-                                 isFocus:true}))
-        dispatch(setAnyOneFocus(true))
-    }
-    else{
-        dispatch(setCheckForAll({value: input.value, state: "Success" ,
-                                 description: '', name: input.name,
-                                 isFocus:false}))
-    }
+        const {value, name, type, placeholder} = input
+
+        const ErrorInput = () => {
+            dispatch(setCheckForAll({value, state: "Error",
+                                    description:'Empty row', name,
+                                    isFocus:true, type, placeholder}))
+            dispatch(setAnyOneFocus(true))
+        }
+
+        const SuccessInput = () =>{
+            dispatch(setCheckForAll({value, state: "Success" ,
+                                    description: '', name,
+                                    isFocus:false, type, placeholder}))
+        }
+
+        if(input.value.length === 0){
+            return ErrorInput()
+        }
+        else{
+            return SuccessInput()
+        }
 })
 
 export const checkLengthWord = createAsyncThunk(
     'registration/inputLength',
     async({input,min}:{input:stateInputType, min: number},{dispatch})=>{
-    if(!input.value){
-        return dispatch(checkEmpty(input))
-    }
-    else if(input.value.length <= min){
-        dispatch(setCheckForAll({value: input.value,state: "Error",
-                                 description:`Password length less ${min}`, name:input.name,
-                                 isFocus: true}))
-        dispatch(setAnyOneFocus(true))
-    }
-    else{
-        dispatch(setCheckForAll({value: input.value,state: "Success" ,
-                                 description: '', name:input.name,
-                                 isFocus: false}))
-    }
+        const {value, type, placeholder, name} = input
+
+        const ErrorInput = () => {
+            dispatch(setCheckForAll({value,state: "Error",
+                                    description:`Password length less ${min}`, name,
+                                    isFocus: true, type, placeholder}))
+            dispatch(setAnyOneFocus(true))
+        }
+        const SuccessInput = () => {
+            dispatch(setCheckForAll({value,state: "Success" ,
+                                    description: '', name,
+                                    isFocus: false, type, placeholder}))
+        }
+
+        if(!input.value){
+            return dispatch(checkEmpty(input))
+        }
+        else if(input.value.length <= min){
+            return ErrorInput()
+        }
+        else{
+            return SuccessInput()
+        }
 })
 
 export const checkRepPassword = createAsyncThunk(
@@ -209,16 +251,25 @@ export const checkRepPassword = createAsyncThunk(
     async(_, {dispatch, getState})=>{
         const selector = getState() as RootState
         const {RegistratePassword, RegistrateRepPassword} = selector.Registrate
-        if(RegistratePassword.value !== RegistrateRepPassword.value){
-            dispatch(setCheckForAll({value: RegistrateRepPassword.value, state:"Error",
-                                     description:`Passwords are not the same`, name:RegistrateRepPassword.name,
-                                     isFocus: true}))
+        const {value, name, type, placeholder} = RegistrateRepPassword
+
+        const ErrorInput = () =>{
+            dispatch(setCheckForAll({value, state:"Error",
+                                     description:`Passwords are not the same`, name,
+                                     isFocus: true, type, placeholder}))
             dispatch(setAnyOneFocus(true))
         }
+        const SuccessInput = () => {
+            dispatch(setCheckForAll({value,state: "Success" ,
+                                    description: '', name,
+                                    isFocus:false, type, placeholder}))
+        }
+
+        if(RegistratePassword.value !== RegistrateRepPassword.value){
+            return ErrorInput()
+        }
         else{
-            dispatch(setCheckForAll({value:RegistrateRepPassword.value,state: "Success" ,
-                                     description: '', name: RegistrateRepPassword.name,
-                                     isFocus:false}))
+            return SuccessInput()
         }
 })
 
@@ -258,8 +309,14 @@ export const checkInputRule = createAsyncThunk(
 export const setInputValue = createAsyncThunk(
     'registration/inputValue',
     async({input, value}:{input:stateInputType, value:string}, {dispatch})=>{
-        const { description, state, isFocus, name} = input
-        dispatch(setCheckForAll({value,description, state, isFocus, name }))
+        dispatch(setCheckForAll({...input, value}))
+    }
+)
+
+export const setTypePassword = createAsyncThunk(
+    'registration/setTypePassword',
+    async({input,type}:{input:stateInputType,type:"text"|"password"}, {dispatch})=>{
+        dispatch(setCheckForAll({...input, type}))
     }
 )
 

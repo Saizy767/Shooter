@@ -1,7 +1,7 @@
 import { FC, useCallback, useEffect } from "react";
 import { useTypedDispatch } from "../../../hooks/useTypedDispatch";
 import { useTypedSelector } from "../../../hooks/useTypedSelector";
-import { ButtonPanelType, InputPanelType, stateInputType, stepsType } from "../../../models/AuthTypes";
+import { ButtonPanelType, stateInputType, stepsType } from "../../../models/AuthTypes";
 import { clickToRegistration, setPrevStepRegistration, setTimer } from "../../../redux/reducers/AuthReducer";
 import { clickCompleteRegistration, clickNextStepRegistration} from "../../../redux/reducers/RegistrateReduce";
 import Registration from "./Registration";
@@ -10,7 +10,7 @@ const RegistrationContainer:FC=()=>{
     const dispatch = useTypedDispatch()
     const {CurrentStepRegistration, Timer} = useTypedSelector((state)=> state.Auth)
     const {RegistrateEmail, RegistratePassword, RegistrateName, 
-           RegistrateRepPassword, RegistrateSurname} = useTypedSelector((state)=> state.Registrate)
+           RegistrateRepPassword, RegistrateSurname, RegistrateCode} = useTypedSelector((state)=> state.Registrate)
 
 
     const arrayReduce = useCallback((array:Array<stateInputType>) =>{
@@ -61,56 +61,10 @@ const RegistrationContainer:FC=()=>{
         thirdStep: 2,
     }
 
-    const FirstInputPanelData:InputPanelType[] = [
-        {
-            id: 1,
-            type: "text",
-            name: "email",
-            placeholder: "E-mail",
-            elem: RegistrateEmail
-        },
-        {
-            id: 2,
-            type: "text",
-            name: "name",
-            placeholder: "Name",
-            elem: RegistrateName
-        },
-        {
-            id: 3,
-            type: "text",
-            name: 'surname',
-            placeholder: "Surname",
-            elem: RegistrateSurname
-        }
-    ]
-    const SecondInputPanelData:InputPanelType[] =[
-        {
-            id: 1,
-            type: "password",
-            name: "password",
-            placeholder: "Password",
-            elem: RegistratePassword
-        },
-        {
-            id: 2,
-            type: "password",
-            name: "reppassword",
-            placeholder: "Repeat password",
-            elem: RegistrateRepPassword
-        },
-    ]
-    const ThirdInputPanelData:InputPanelType[] = [
-        {
-            id: 1,
-            name: "code",
-            type: "text",
-            placeholder: "Code"
-        },
-    ]
 
-    const InputPanelData = CurrentStepRegistration === 0 ? FirstInputPanelData : 
-                           CurrentStepRegistration === 1 ? SecondInputPanelData : ThirdInputPanelData
+    const InputPanelData = CurrentStepRegistration === 0 ? [RegistrateEmail,RegistrateName,RegistrateSurname] : 
+                           CurrentStepRegistration === 1 ? [RegistratePassword,RegistrateRepPassword] : 
+                                                           [RegistrateCode]
     
     return(
         <Registration step={CurrentStepRegistration} steps={steps} 
