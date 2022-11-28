@@ -155,9 +155,11 @@ export const checkInvalidEmail = createAsyncThunk(
                                          isFocus:true, typeInput, placeholder}))
         }
         const SuccessInput = () => {
-            (input.name === RegistrateEmail.name) && dispatch(checkExistingEmail({email: value}))
-            localStorage.setItem(`registration`, 
-                                    JSON.stringify({ email: input.value, isExisting: false }))
+            if(input.name === RegistrateEmail.name){
+                dispatch(checkExistingEmail({email: value}))
+                localStorage.setItem(`registration`, 
+                        JSON.stringify({ email: input.value, isExisting: false }))
+            }
             return dispatch(setCheckForAllReg({value, state: "Success",
                                               description: '', name: 'email',
                                               isFocus:false, typeInput, placeholder}))
@@ -257,12 +259,13 @@ export const checkEmpty = createAsyncThunk(
 
 export const checkLengthWord = createAsyncThunk(
     'registration/inputLength',
-    async({input,min}:{input:stateInputType, min: number},{dispatch})=>{
+    async({input,min, max}:{input:stateInputType, min?: number, max?:number},{dispatch})=>{
         const {value, typeInput, placeholder, name} = input
 
-        const ErrorInput = () => {
+        const ErrorInput = (desc:'min'|'max') => {
             dispatch(setCheckForAllReg({value,state: "Error",
-                                    description:`Password length less ${min}`, name,
+                                    description:`Password length ${desc === 'min' ? 'less ' + min: 'more that ' + max}`,
+                                    name,
                                     isFocus: true, typeInput, placeholder}))
             dispatch(setAnyOneFocus(true))
         }
@@ -275,8 +278,11 @@ export const checkLengthWord = createAsyncThunk(
         if(!input.value){
             return dispatch(checkEmpty(input))
         }
-        else if(input.value.length <= min){
-            return ErrorInput()
+        else if(min && (input.value.length <= min)){
+            return ErrorInput('min')
+        }
+        else if(max && (input.value.length >= max)){
+            return ErrorInput('max')
         }
         else{
             return SuccessInput()
@@ -320,6 +326,7 @@ export const checkInputRule = createAsyncThunk(
             switch (args[i].name){
                 case('email'):{
                     dispatch(checkInvalidEmail(RegistrateEmail))
+                    dispatch(checkLengthWord({input:RegistratePassword,max:50}))
                     break
                 }
                 case('Auth_email'):{
@@ -388,7 +395,16 @@ export const clickNextStepRegistration = createAsyncThunk(
                         dispatch(PostData(
                             {
                                 url:`${process.env.REACT_APP_SERVER_HOST}/user/registration` || '',
-                                data:{RegistrateName, RegistrateSurname, RegistrateEmail, RegistratePassword}
+                                data:{name:RegistrateName.value,
+                                      surname:RegistrateSurname.value,
+                                      email:RegistrateEmail.value,
+                                      password:RegistratePassword.value}
+                            }
+                        ))
+                        dispatch(PostData(
+                            {
+                                url:`${process.env.REACT_APP_SERVER_HOST}/user/text-mail` || '',
+                                data:{toEmail:RegistrateEmail.value}
                             }
                         ))
                         dispatch(setNextStepRegistration())

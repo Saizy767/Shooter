@@ -1,14 +1,13 @@
-import { CoctailType, ingredientType } from '../models/user-modules';
 import { Request, Response } from 'express';
 import bd from '../database/db'
 
 class UserController{
     async registrateUser(req: Request,res: Response){
-        const {RegistrateName, RegistrateSurname, RegistrateEmail, RegistratePassword} = req.body
+        const {name, surname, email, password} = req.body
         const newPerson = await bd.query(
             `INSERT INTO person (name, surname, favorites, homebar, password, email, isActivated)
              VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
-            [RegistrateName, RegistrateSurname, [], [], RegistratePassword, RegistrateEmail, false])
+            [name, surname, [], [], password, email, false])
         res.json(newPerson.rows)
     }
     async getLogin(req:Request, res: Response ){

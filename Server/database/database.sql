@@ -1,6 +1,6 @@
 create TABLE person(
     id SERIAL PRIMARY KEY,
-    email VARCHAR (50) UNIQUE,
+    email VARCHAR (75) UNIQUE,
     password VARCHAR(255),
     name VARCHAR(255),
     surname VARCHAR(255),

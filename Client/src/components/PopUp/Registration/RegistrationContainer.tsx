@@ -69,7 +69,7 @@ const RegistrationContainer:FC=()=>{
     return(
         <Registration step={CurrentStepRegistration} steps={steps} 
                       ButtonPanelData={ButtonPanelData} InputPanelData={InputPanelData} timer={Timer}
-                      TimerButtonProps={TimerButton}/>
+                      TimerButtonProps={TimerButton} email={RegistrateEmail.value}/>
     )
 }
 
