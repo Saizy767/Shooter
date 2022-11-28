@@ -195,11 +195,7 @@ export const checkExistingEmail = createAsyncThunk(
     async({email}:{email:string},{dispatch, getState})=>{
         const selector = getState() as RootState
         const {value, typeInput, placeholder, name} = selector.Registrate.RegistrateEmail
-        const result = await dispatch(GetData(
-            {
-                url: `${process.env.REACT_APP_SERVER_HOST}/user/${email}` || '',
-            }
-        ))
+    
         const ErrorInput = () =>{
             dispatch(setCheckForAllReg({value, state: "Error",
                                      description: 'Email is existing', name:  name,
@@ -211,11 +207,19 @@ export const checkExistingEmail = createAsyncThunk(
                                      description: '', name: name,
                                      isFocus:false, typeInput, placeholder}))
         }
-        if(result.payload[0].email === email){
-            return ErrorInput()
-        }
-        else{
-            return SuccessInput()
+        if(email !== localStorage.getItem('email')){
+            localStorage.setItem('email', email)
+            const result = await dispatch(GetData(
+                {
+                    url: `${process.env.REACT_APP_SERVER_HOST}/user/${email}` || '',
+                }
+            ))
+            if(result.payload[0].email === email){
+                return ErrorInput()
+            }
+                else{
+                    return SuccessInput()
+                }
         }
     }
 )
@@ -308,7 +312,6 @@ export const checkInputRule = createAsyncThunk(
         const {RegistratePassword, RegistrateName, RegistrateSurname,
                RegistrateEmail, AuthorizationEmail, AuthorizationPassword} = selector.Registrate
         for(let i = 0;i<= args.length; i++){
-            console.log(args[i].name)
             switch (args[i].name){
                 case('email'):{
                     dispatch(checkInvalidEmail(RegistrateEmail))
@@ -365,7 +368,9 @@ export const clickNextStepRegistration = createAsyncThunk(
         const {RegistrateName, RegistrateSurname, RegistrateEmail,
                RegistratePassword, RegistrateRepPassword} = selector.Registrate
         const {CurrentStepRegistration} = selector.Auth
+
         dispatch(setErrorValidation(stateButton))
+        
             switch(CurrentStepRegistration){
                 case(0):{
                     dispatch(checkInputRule({args:[RegistrateEmail, RegistrateName, RegistrateSurname]}))

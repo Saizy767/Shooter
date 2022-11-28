@@ -56,6 +56,7 @@ export const clickToRegistration = createAsyncThunk(
     async(stateRegistration:boolean, {dispatch}) => {
         dispatch(setVisibilityAuth(!stateRegistration))
         dispatch(setVisibilityRegistration(stateRegistration))
+        stateRegistration && localStorage.setItem(`email`, ``)
     }
 )
 
