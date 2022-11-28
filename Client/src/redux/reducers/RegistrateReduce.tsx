@@ -2,8 +2,9 @@ import { createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit'
 import { stateInputType } from '../../models/AuthTypes';
 import { RootState } from '../rootReducer';
 import { GetData, PostData } from './APIReducer';
-import { setAnyOneFocus, setErrorValidation,
-         setNextStepRegistration, setTimer, setVisibilityRegistration } from './AuthReducer';
+import { clickToRegistration, setAnyOneFocus, setErrorValidation,
+         setNextStepRegistration, setTimer } from './AuthReducer';
+
 
 type RegistrateType = {
     RegistrateEmail: stateInputType,
@@ -126,6 +127,10 @@ export const registrateSlice = createSlice({
                     state.RegistrateRepPassword = action.payload
                     break
                 }
+                case('code'):{
+                    state.RegistrateCode = action.payload
+                    break
+                }
                 default:{
                     console.log('This input didnt in RegistrateReducer')
                     console.log(action.payload)
@@ -144,16 +149,19 @@ export const checkInvalidEmail = createAsyncThunk(
         const tester = /^[-!#$%&'*+\\/0-9=?A-Z^_a-z`{|}~](\.?[-!#$%&'*+\\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/;
 
         const ErrorInput = () => {
-            dispatch(setCheckForAllReg({value, state: "Error",
+            dispatch(setAnyOneFocus(true))
+            return dispatch(setCheckForAllReg({value, state: "Error",
                                          description: 'Email is invalid', name: name,
                                          isFocus:true, typeInput, placeholder}))
-            return dispatch(setAnyOneFocus(true))
         }
         const SuccessInput = () => {
-            (input === RegistrateEmail) && dispatch(checkExistingEmail({email: value}))
+            (input.name === RegistrateEmail.name) && dispatch(checkExistingEmail({email: value}))
+            localStorage.setItem(`registration`, 
+                                    JSON.stringify({ email: input.value, isExisting: false }))
             return dispatch(setCheckForAllReg({value, state: "Success",
-                                            description: '', name: 'email',
-                                            isFocus:false, typeInput, placeholder}))
+                                              description: '', name: 'email',
+                                              isFocus:false, typeInput, placeholder}))
+                                                                     
 
         }
         
@@ -195,31 +203,28 @@ export const checkExistingEmail = createAsyncThunk(
     async({email}:{email:string},{dispatch, getState})=>{
         const selector = getState() as RootState
         const {value, typeInput, placeholder, name} = selector.Registrate.RegistrateEmail
-    
+        const local =  JSON.parse(localStorage.getItem('registration')||'') as unknown as {email:string, isExisting: boolean}
+        
         const ErrorInput = () =>{
+            localStorage.setItem(`registration`,
+                                 JSON.stringify({ email, isExisting: true }))
             dispatch(setCheckForAllReg({value, state: "Error",
                                      description: 'Email is existing', name:  name,
                                      isFocus:true, typeInput, placeholder}))
             dispatch(setAnyOneFocus(true))
         }
-        const SuccessInput = () => {
-            dispatch(setCheckForAllReg({value, state: "Success",
-                                     description: '', name: name,
-                                     isFocus:false, typeInput, placeholder}))
-        }
-        if(email !== localStorage.getItem('email')){
-            localStorage.setItem('email', email)
-            const result = await dispatch(GetData(
-                {
-                    url: `${process.env.REACT_APP_SERVER_HOST}/user/${email}` || '',
-                }
-            ))
-            if(result.payload[0].email === email){
-                return ErrorInput()
+        
+        const result = (local.email !== email && await dispatch(GetData(
+            {
+                url: `${process.env.REACT_APP_SERVER_HOST}/user/${email}` || '',
             }
-                else{
-                    return SuccessInput()
-                }
+        )))
+        
+        if(local.isExisting){
+            return ErrorInput()
+        }
+        if((result && result.payload[0].email) === email){
+            return ErrorInput()
         }
     }
 )
@@ -400,7 +405,8 @@ export const clickNextStepRegistration = createAsyncThunk(
 export const clickCompleteRegistration = createAsyncThunk(
     'registrate/complete',
     async(_,{dispatch})=>{
-        dispatch(setVisibilityRegistration(false))
+        localStorage.clear()
+        dispatch(clickToRegistration(false))
     }
 )
 

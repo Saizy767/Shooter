@@ -1,4 +1,6 @@
 import { AnyAction, createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit'
+import { RootState } from '../rootReducer'
+import { setInputValue } from './RegistrateReduce'
 
 type AuthModule = {
     visibilityAuth: boolean,
@@ -53,10 +55,25 @@ export const authSlice = createSlice({
 
 export const clickToRegistration = createAsyncThunk(
     'auth/Registration',
-    async(stateRegistration:boolean, {dispatch}) => {
+    async(stateRegistration:boolean, {dispatch,getState}) => {
+
+        const selector = getState() as RootState
+        const {RegistrateCode,RegistrateEmail,RegistrateName,
+            RegistratePassword,RegistrateRepPassword,RegistrateSurname} = selector.Registrate
+        const InputReg = [RegistrateCode,RegistrateEmail,RegistrateName,
+            RegistratePassword,RegistrateRepPassword,RegistrateSurname]
         dispatch(setVisibilityAuth(!stateRegistration))
         dispatch(setVisibilityRegistration(stateRegistration))
-        stateRegistration && localStorage.setItem(`email`, ``)
+
+        if (stateRegistration){
+            InputReg.forEach((input)=>{
+                dispatch(setInputValue({input, value: ''}))
+            })
+            localStorage.setItem(`registration`, JSON.stringify({email:'', isExisting: false}))
+        }
+        else{
+            localStorage.clear()
+        }
     }
 )
 
