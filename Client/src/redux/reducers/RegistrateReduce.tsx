@@ -138,7 +138,8 @@ export const registrateSlice = createSlice({
             }
         }
     }
-})
+}
+)
 
 export const checkInvalidEmail = createAsyncThunk(
     'registration/checkInvalidEmail',
@@ -168,44 +169,40 @@ export const checkInvalidEmail = createAsyncThunk(
         }
         
         const emailParts = value.split('@');
-            if(!value){
-                return dispatch(checkEmpty(input))
-            }
-            if(emailParts.length !== 2) {
-                return ErrorInput()
-            }
-            
-            const account = emailParts[0];
-            const address = emailParts[1];
-
-            if(account.length > 64){
-                return ErrorInput()
-            }
-
-            else if(address.length > 255){
-                return ErrorInput()
-            }
-
-            const domainParts = address.split('.');
-            if (domainParts.some(function (part) {
-                return part.length > 63;
-            }))
+        if(!value){
+            return dispatch(checkEmpty(input))
+        }
+        if(emailParts.length !== 2) {
             return ErrorInput()
-
-
-            if (!tester.test(value)){
-                return ErrorInput()
-            };
-            
-            return SuccessInput()
-        })
+        }
+        
+        const account = emailParts[0];
+        const address = emailParts[1];
+        if(account.length > 64){
+            return ErrorInput()
+        }
+        else if(address.length > 255){
+            return ErrorInput()
+        }
+        const domainParts = address.split('.');
+        if (domainParts.some(function (part) {
+            return part.length > 63;
+        }))
+        return ErrorInput()
+        if (!tester.test(value)){
+            return ErrorInput()
+        };
+        
+        return SuccessInput()
+    }
+)
 
 export const checkExistingEmail = createAsyncThunk(
     'registration/checkExistingEmail',
     async({email}:{email:string},{dispatch, getState})=>{
         const selector = getState() as RootState
         const {value, typeInput, placeholder, name} = selector.Registrate.RegistrateEmail
-        const local =  JSON.parse(localStorage.getItem('registration')||'') as unknown as {email:string, isExisting: boolean}
+        const local =  JSON.parse(localStorage.getItem('registration')||'') as {email:string, isExisting: boolean}
         
         const ErrorInput = () =>{
             localStorage.setItem(`registration`,
@@ -255,7 +252,8 @@ export const checkEmpty = createAsyncThunk(
         else{
             return SuccessInput()
         }
-})
+    }
+)
 
 export const checkLengthWord = createAsyncThunk(
     'registration/inputLength',
@@ -287,7 +285,8 @@ export const checkLengthWord = createAsyncThunk(
         else{
             return SuccessInput()
         }
-})
+    }
+)
 
 export const checkRepPassword = createAsyncThunk(
     'registration/checkRepPassword',
@@ -314,7 +313,8 @@ export const checkRepPassword = createAsyncThunk(
         else{
             return SuccessInput()
         }
-})
+    }
+)
 
 export const checkInputRule = createAsyncThunk(
     'registration/checkInputRule',

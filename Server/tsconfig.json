@@ -6,10 +6,6 @@
       "removeComments": true,
       "preserveConstEnums": true,
       "sourceMap": true,
-      "paths": {
-        "@App/*": ["./*"],
-        "lib/*": ["./*"]
-      },
       "esModuleInterop": true
     }
 }

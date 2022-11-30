@@ -1,14 +1,23 @@
 import { Request, Response } from 'express';
 import bd from '../database/db'
+import * as jwt from 'jsonwebtoken';
+import * as dotenv from 'dotenv'
+
+dotenv.config()
 
 class UserController{
-    async registrateUser(req: Request,res: Response){
+    async registrate(req: Request,res: Response){
         const {name, surname, email, password} = req.body
         const newPerson = await bd.query(
             `INSERT INTO person (name, surname, favorites, homebar, password, email, isActivated)
              VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
             [name, surname, [], [], password, email, false])
         res.json(newPerson.rows)
+    }
+    async login(req:Request, res: Response){
+        const token = () => jwt.sign(req.body.username, process.env.TOKENJWT, { expiresIn: '1800s' })
+        console.log(token)
+        res.json(token)
     }
     async getLogin(req:Request, res: Response ){
         const email = req.params.email

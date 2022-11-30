@@ -27,7 +27,7 @@ const Registration:FC<RegistrationProps> = ({step, steps, ButtonPanelData, email
                 <InputPanel props={InputPanelData}/>
             }
             {steps.thirdStep === step && 
-                <>
+                <div>
                     <span className={style.Message}> We send code to {email}, please check</span>
                     <InputPanel props={InputPanelData}/>
                     <span className={style.Timer}>If code dont came after {timer} seconds click on button</span>
@@ -35,7 +35,7 @@ const Registration:FC<RegistrationProps> = ({step, steps, ButtonPanelData, email
                     <div className={style.Button}>
                         <ButtonContainer props={TimerButtonProps}/>
                     </div>}
-                </>
+                </div>
             }
         </PopUpAuth>
     )
