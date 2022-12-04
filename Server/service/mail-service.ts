@@ -1,11 +1,8 @@
-import { Response, Request } from 'express';
+import { Response } from 'express';
 import nodemailer from 'nodemailer';
 
-class MailController {
-    async sendToEmail(req: Request,res:Response){
-        const {toEmail} = req.body;
-        const code = '123124'
-
+class MailService {
+    async sendToEmail(email:string, code:string,res?:Response){
         const transporter = nodemailer.createTransport({
             port: 465,          
             host: "smtp.gmail.com",
@@ -18,7 +15,7 @@ class MailController {
 
         const MailData = {
             from: process.env.EMAIL_SENDER,
-            to:toEmail,
+            to:email,
             subject:"Code Authorization",
             text:code,
             html: `
@@ -27,9 +24,9 @@ class MailController {
         }
         transporter.sendMail(MailData , (error: Error) =>{
             error && console.log(error)
-            res.status(200).send({message: `Mail send to ${toEmail.value}`})
+            res.status(200).send({message: `Mail send to ${email}`})
         })
     }
 }
 
-export default new MailController()
+export default new MailService()

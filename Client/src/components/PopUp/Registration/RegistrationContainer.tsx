@@ -3,7 +3,7 @@ import { useTypedDispatch } from "../../../hooks/useTypedDispatch";
 import { useTypedSelector } from "../../../hooks/useTypedSelector";
 import { ButtonPanelType, stateInputType, stepsType } from "../../../models/AuthTypes";
 import { clickToRegistration, setPrevStepRegistration, setTimer } from "../../../redux/reducers/AuthReducer";
-import { clickCompleteRegistration, clickNextStepRegistration} from "../../../redux/reducers/RegistrateReduce";
+import { clickCompleteRegistration, clickNextStepRegistration, clickSendCodeEmail} from "../../../redux/reducers/RegistrateReduce";
 import Registration from "./Registration";
 
 const RegistrationContainer:FC=()=>{
@@ -52,7 +52,7 @@ const RegistrationContainer:FC=()=>{
     const TimerButton: ButtonPanelType = {
         id:3,
         name: "Send Again",
-        onClick: () => dispatch(setTimer(20)),
+        onClick: () => dispatch(clickSendCodeEmail()),
         typeMessage: 'Warning'
     }
     const steps: stepsType = {

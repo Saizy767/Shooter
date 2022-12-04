@@ -14,6 +14,21 @@ export const PostData = createAsyncThunk(
     }
 )
 
+export const PatchData = createAsyncThunk(
+  'data/patch',
+  async({url, data}:{url: string, data: any})=>{
+      const response = await fetch(url, {
+          method: 'PATCH', 
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+        console.log(response.json)
+        return response.json
+  }
+)
+
 export const GetData = createAsyncThunk(
   'data/get',
   async({url}:{url: string}) =>{

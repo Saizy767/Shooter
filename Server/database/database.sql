@@ -6,7 +6,8 @@ create TABLE person(
     surname VARCHAR(255),
     favorites json,
     homebar json,
-    isActivated boolean
+    isActivated boolean,
+    activatedCode VARCHAR(6)
 );
 
 create TABLE cocteil(

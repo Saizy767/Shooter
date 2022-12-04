@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit'
 import { stateInputType } from '../../models/AuthTypes';
 import { RootState } from '../rootReducer';
-import { GetData, PostData } from './APIReducer';
-import { clickToRegistration, setAnyOneFocus, setErrorValidation,
+import { GetData, PatchData, PostData } from './APIReducer';
+import { setAnyOneFocus, setErrorValidation,
          setNextStepRegistration, setTimer } from './AuthReducer';
 
 
@@ -401,12 +401,6 @@ export const clickNextStepRegistration = createAsyncThunk(
                                       password:RegistratePassword.value}
                             }
                         ))
-                        dispatch(PostData(
-                            {
-                                url:`${process.env.REACT_APP_SERVER_HOST}/user/text-mail` || '',
-                                data:{toEmail:RegistrateEmail.value}
-                            }
-                        ))
                         dispatch(setNextStepRegistration())
                         dispatch(setTimer(30))
                     }
@@ -420,12 +414,31 @@ export const clickNextStepRegistration = createAsyncThunk(
 
 export const clickCompleteRegistration = createAsyncThunk(
     'registrate/complete',
-    async(_,{dispatch})=>{
+    async(_,{dispatch, getState})=>{
+        const selector = getState() as RootState
+        const {RegistrateEmail, RegistrateCode} = selector.Registrate
         localStorage.clear()
-        dispatch(clickToRegistration(false))
+        dispatch(PatchData(
+            {
+                url:`${process.env.REACT_APP_SERVER_HOST}/user/auth-code` || '',
+                data:{email:RegistrateEmail.value, code: RegistrateCode.value}
+            }
+        ))
     }
 )
-
+export const clickSendCodeEmail = createAsyncThunk(
+    'registrate/sendmailer',
+    async(_,{dispatch, getState})=>{
+        console.log('send')
+        const selector = getState() as RootState
+        const {RegistrateEmail} = selector.Registrate
+        dispatch(PostData({
+            url:`${process.env.REACT_APP_SERVER_HOST}/user/send-mail` || '',
+            data:{email:RegistrateEmail.value}
+        }))
+        dispatch(setTimer(20))
+    }
+)
 
 export const {setCheckForAllReg} = registrateSlice.actions
 export default registrateSlice

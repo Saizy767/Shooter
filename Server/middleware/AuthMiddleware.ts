@@ -9,7 +9,7 @@ function authenticateToken(req:IGetUserAuthInfoRequest, res:Response, next:NextF
         return res.sendStatus(401)
     }
     
-    jwt.verify(token, process.env.TOKENJWT as string, (err:any, user:string)=>{
+    jwt.verify(token, process.env.ACCESS_TOKEN as string, (err:any, user:string)=>{
         console.log(err)
 
         if(err) return res.sendStatus(403)

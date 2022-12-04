@@ -5,6 +5,8 @@ import userController from '../controllers/user.controller'
 const userRoute = Router()
 
 userRoute.post('/user/registration', userController.registrate)
+userRoute.patch('/user/auth-code', userController.checkAuthCode)
+userRoute.post('/user/send-mail', userController.sendMail)
 userRoute.post('user/login', userController.login)
 userRoute.delete('/user/:id', userController.deleteUser)
 userRoute.get('/user/:email', userController.getLogin)
