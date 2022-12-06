@@ -16,9 +16,3 @@ app.use(express.json())
 app.use(cors())
 app.use('/api', userRoute, cors(corsOptions))
 app.use('/api', coctailRoute)
-
-app.listen(PORT, () => {
-  console.log(`Server listening on ${PORT}`);
-});
-
-

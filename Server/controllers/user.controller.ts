@@ -4,24 +4,78 @@ import * as jwt from 'jsonwebtoken';
 import * as dotenv from 'dotenv'
 import mailService from '../service/mail-service';
 import * as bscript from 'bcryptjs'
-import { emit } from 'process';
+import checkService from '../service/checker-service';
 
 dotenv.config()
 
 class UserController{
     async registrate(req: Request,res: Response){
-        const {name, surname, email, password} = req.body
-
-        const securePassword = bscript.hashSync(password, 6)
-        const activationCode = Math.floor(Math.random() * 999999).toString()
-
-        const newPerson = await bd.query(
-            `INSERT INTO person (name, surname, email, password, favorites, homebar, isActivated, activatedCode)
-             VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *`,
-            [name, surname, email, securePassword, [], [], false, activationCode])
-
-        mailService.sendToEmail(email, activationCode)
-        res.json(newPerson.rows)
+        try{
+            const {name, surname, email, password}:{name:string,
+                                                    surname: string,
+                                                    email: string,
+                                                    password: string} = req.body
+            if(!name.length){
+                return res.status(400).json('Name empty')
+            }
+            if(!surname.length){
+                return res.status(400).json('Surname empty')
+            }
+            if(!email.length){
+                return res.status(400).json('Email empty')
+            }
+            if(!password.length){
+                return res.status(400).json('Password empty')
+            }
+            const securePassword = bscript.hashSync(password, 6)
+            const activationCode = Math.floor(Math.random() * 999999).toString()
+            const id = await bd.query(
+                `INSERT INTO person (name, surname, email,
+                                    password, favorites, homebar, 
+                                    isActivated,tokenActivated, activatedCode)
+                VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id`,
+                [name, surname, email, securePassword, [], [], false, false, activationCode])
+            res.status(200).json({message:'Account created', id})
+            mailService.sendToEmail(email, activationCode)
+        }
+        catch(err){
+            throw Error
+        }
+    }
+    async registratePut(req: Request,res: Response){
+        try{
+            const id = req.params.id
+            const {name, surname, email, password}:{name:string,
+                                                    surname: string,
+                                                    email: string,
+                                                    password: string,
+                                                    id:number} = req.body
+            if(!name.length){
+                return res.status(400).json('Name empty')
+            }
+            if(!surname.length){
+                return res.status(400).json('Surname empty')
+            }
+            if(!email.length){
+                return res.status(400).json('Email empty')
+            }
+            if(!password.length){
+                return res.status(400).json('Password empty')
+            }
+            const securePassword = bscript.hashSync(password, 6)
+            const activationCode = Math.floor(Math.random() * 999999).toString()
+            await bd.query(
+                `UPDATE person SET (name, surname, email,
+                                    password, favorites, homebar, 
+                                    isActivated,tokenActivated, activatedCode) WHERE id= $9
+                VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
+                [name, surname, email, securePassword, [], [], false, false, activationCode, id])
+            res.status(200).json('Registration updated')
+            mailService.sendToEmail(email, activationCode)
+        }
+        catch(err){
+            throw Error
+        }
     }
     async login(req:Request, res: Response){
         const {email , password} = req.body
@@ -71,21 +125,22 @@ class UserController{
         mailService.sendToEmail(email, activationCode)
     }
     async checkAuthCode(req: Request, res: Response){
-        const {code, email} = req.body
-        const codeAuth = await bd.query(`SELECT activatedCode FROM person WHERE email=$1`,[email])
-       
-        if (code === codeAuth.rows[0].activatedcode){
-            await bd.query(`UPDATE person SET isActivated = $1 WHERE email = $2`,[true, email])
-            res.status(200).json('This is corrected code')
+        try{
+            const {code, email} = req.body
+            const codeAuth = await bd.query(`SELECT activatedCode FROM person WHERE email=$1`,[email])
+            if (code === codeAuth.rows[0].activatedcode){
+                await bd.query(`UPDATE person SET isActivated = $1 WHERE email = $2`,[true, email])
+                res.status(200).json('Correct')
+            }
+        }catch(err){
+            res.status(400).json('Error')
         }
-        else{
-            throw Error('User send incorrected authorization code')
-        }
+        res.status(400).json('Error')
     }
-    async getLogin(req:Request, res: Response ){
-        const email = req.params.email
-        const findEmail = await bd.query(`SELECT email FROM person WHERE email = $1`,[email])
-        res.json(findEmail.rows)
+    async getEmail(req:Request, res: Response ){
+        const emailParams = req.params.email
+        const emailDB = await bd.query(`SELECT email FROM person WHERE email = $1`,[emailParams])
+        checkService.checkEmail(emailDB.rows[0],emailParams)
     }
     async getUsers(req: Request,res: Response){
         const users = await bd.query(`SELECT * FROM person`)

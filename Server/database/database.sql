@@ -7,6 +7,7 @@ create TABLE person(
     favorites json,
     homebar json,
     isActivated boolean,
+    tokenActivated boolean,
     activatedCode VARCHAR(6)
 );
 
