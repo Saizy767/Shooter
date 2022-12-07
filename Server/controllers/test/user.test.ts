@@ -22,26 +22,27 @@ describe('registration',()=>{
         const user = { name:'Mike', surname:'Dark' , email: 'qwerty@gmail.com', password: 'qwerty'};
         const response = await request(app).post("/api/user/registration").send(user);
         expect(response.body.message).toBe('Account created')
+        expect(response.body.id).toBe('DB Created')
     })
     test('It should response name empty', async () => {
         const user = { name:'' , surname:'Dark' , email: 'qwerty@gmail.com', password: 'qwerty'};
         const response = await request(app).post("/api/user/registration").send(user);
-        expect(response.body).toBe('Name empty')
+        expect(response.body).toBe('Invalid value')
     })
     test('It should response surname empty', async () => {
         const user = { name:'Mike' , surname:'' , email: 'qwerty@gmail.com', password: 'qwerty'};
         const response = await request(app).post("/api/user/registration").send(user);
-        expect(response.body).toBe('Surname empty')
+        expect(response.body).toBe('Invalid value')
     })
     test('It should response email empty', async () => {
         const user = { name:'Mike' , surname:'Dark' , email: '', password: 'qwerty'};
         const response = await request(app).post("/api/user/registration").send(user);
-        expect(response.body).toBe('Email empty')
+        expect(response.body).toBe('Invalid value')
     })
     test('It should response password empty', async () => {
         const user = { name:'Mike' , surname:'Dark' , email: 'qwerty@gmail.com', password: ''};
         const response = await request(app).post("/api/user/registration").send(user);
-        expect(response.body).toBe('Password empty')
+        expect(response.body).toBe('Invalid value')
     })
 })
 

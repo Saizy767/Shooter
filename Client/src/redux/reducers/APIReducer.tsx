@@ -10,7 +10,7 @@ export const PostData = createAsyncThunk(
             },
             body: JSON.stringify(data)
           });
-          return response.json
+          return response.json()
     }
 )
 
@@ -24,8 +24,7 @@ export const PatchData = createAsyncThunk(
           },
           body: JSON.stringify(data)
         });
-        console.log(response.json)
-        return response.json
+        return response.json()
   }
 )
 

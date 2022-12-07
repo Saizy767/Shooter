@@ -5,77 +5,55 @@ import * as dotenv from 'dotenv'
 import mailService from '../service/mail-service';
 import * as bscript from 'bcryptjs'
 import checkService from '../service/checker-service';
+import {validationResult} from 'express-validator'
+import { ErrorVal } from '../models/user-modules';
 
 dotenv.config()
 
 class UserController{
     async registrate(req: Request,res: Response){
-        try{
-            const {name, surname, email, password}:{name:string,
-                                                    surname: string,
-                                                    email: string,
-                                                    password: string} = req.body
-            if(!name.length){
-                return res.status(400).json('Name empty')
-            }
-            if(!surname.length){
-                return res.status(400).json('Surname empty')
-            }
-            if(!email.length){
-                return res.status(400).json('Email empty')
-            }
-            if(!password.length){
-                return res.status(400).json('Password empty')
-            }
-            const securePassword = bscript.hashSync(password, 6)
-            const activationCode = Math.floor(Math.random() * 999999).toString()
-            const id = await bd.query(
-                `INSERT INTO person (name, surname, email,
-                                    password, favorites, homebar, 
-                                    isActivated,tokenActivated, activatedCode)
-                VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id`,
-                [name, surname, email, securePassword, [], [], false, false, activationCode])
-            res.status(200).json({message:'Account created', id})
-            mailService.sendToEmail(email, activationCode)
+        const error = validationResult(req) as unknown as ErrorVal
+        const {name, surname, email, password}:{name:string,
+                                                surname: string,
+                                                email: string,
+                                                password: string} = req.body
+        if(error.errors.length){
+            return res.status(400).json(error.errors[0].msg)
         }
-        catch(err){
-            throw Error
-        }
+        const securePassword = bscript.hashSync(password, 6)
+        const activationCode = Math.floor(Math.random() * 999999).toString()
+        const id = await bd.query(
+            `INSERT INTO person (name, surname, email,
+                                password, favorites, homebar, 
+                                isActivated,tokenActivated, activatedCode)
+            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id`,
+            [name, surname, email, securePassword, [], [], false, false, activationCode])
+        
+        res.status(201).json({message:'Account created', id: (id && id.rows[0]) || 'DB Created'})
+        mailService.sendToEmail(email, activationCode)
     }
     async registratePut(req: Request,res: Response){
-        try{
-            const id = req.params.id
-            const {name, surname, email, password}:{name:string,
-                                                    surname: string,
-                                                    email: string,
-                                                    password: string,
-                                                    id:number} = req.body
-            if(!name.length){
-                return res.status(400).json('Name empty')
-            }
-            if(!surname.length){
-                return res.status(400).json('Surname empty')
-            }
-            if(!email.length){
-                return res.status(400).json('Email empty')
-            }
-            if(!password.length){
-                return res.status(400).json('Password empty')
-            }
-            const securePassword = bscript.hashSync(password, 6)
-            const activationCode = Math.floor(Math.random() * 999999).toString()
-            await bd.query(
-                `UPDATE person SET (name, surname, email,
-                                    password, favorites, homebar, 
-                                    isActivated,tokenActivated, activatedCode) WHERE id= $9
-                VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
-                [name, surname, email, securePassword, [], [], false, false, activationCode, id])
-            res.status(200).json('Registration updated')
-            mailService.sendToEmail(email, activationCode)
+        const id = req.params.id
+        const error = validationResult(req) as unknown as ErrorVal
+        const {name, surname, email, password}:{name:string,
+                                                surname: string,
+                                                email: string,
+                                                password: string,
+                                                id:number} = req.body
+        if(error.errors.length){
+            return res.status(400).json(error.errors[0].msg)
         }
-        catch(err){
-            throw Error
-        }
+        const securePassword = bscript.hashSync(password, 6)
+        const activationCode = Math.floor(Math.random() * 999999).toString()
+        await bd.query(
+            `UPDATE person SET (name, surname, email,
+                                password, favorites, homebar, 
+                                isActivated,tokenActivated, activatedCode) WHERE id= $9
+            VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
+            [name, surname, email, securePassword, [], [], false, false, activationCode, id])
+        bd.end()
+        res.status(200).json({message:'Account updated'})
+        mailService.sendToEmail(email, activationCode)
     }
     async login(req:Request, res: Response){
         const {email , password} = req.body
@@ -97,7 +75,6 @@ class UserController{
         res.status(200).json(response)
     }
     async getToken(req: Request, res: Response){
-        
         const postData:{refreshToken:string, email:string, name: string} = req.body
         const tokenList:any = {}
         if((postData.refreshToken) && (postData.refreshToken in tokenList)){
@@ -117,25 +94,36 @@ class UserController{
          }
     }
     async sendMail(req: Request, res: Response){
-        const {email} = req.body
-        const activationCode = Math.floor(Math.random() * 999999).toString()
-
-        await bd.query(`UPDATE person SET activatedCode=$1 WHERE email=$2`,[activationCode, email])
-
-        mailService.sendToEmail(email, activationCode)
+        try{
+            const {email} = req.body
+            const error = validationResult(req) as unknown as ErrorVal
+            const activationCode = Math.floor(Math.random() * 999999).toString()
+            if(error){
+                return res.status(400).json(error.errors[0].msg)
+            }
+            await bd.query(`UPDATE person SET activatedCode=$1 WHERE email=$2`,[activationCode, email])
+            mailService.sendToEmail(email, activationCode, res)
+        }
+        catch(err){
+            res.status(500).json(err)
+            throw Error
+        }
     }
     async checkAuthCode(req: Request, res: Response){
-        try{
-            const {code, email} = req.body
-            const codeAuth = await bd.query(`SELECT activatedCode FROM person WHERE email=$1`,[email])
-            if (code === codeAuth.rows[0].activatedcode){
-                await bd.query(`UPDATE person SET isActivated = $1 WHERE email = $2`,[true, email])
-                res.status(200).json('Correct')
-            }
-        }catch(err){
-            res.status(400).json('Error')
+        const {code, email} = req.body
+        const error = validationResult(req) as unknown as ErrorVal
+        const codeAuth = await bd.query(`SELECT activatedCode FROM person WHERE email=$1`,[email])
+        if(error.errors.length){
+            return res.status(400).json(error.errors[0].msg)
         }
-        res.status(400).json('Error')
+        if (code === codeAuth.rows[0].activatedcode){
+            await bd.query(`UPDATE person SET isActivated = $1 WHERE email = $2`,[true, email])
+            bd.end()
+            res.status(200).json('Authorization code updated')
+        }
+        else{
+            res.status(400).json('Authorization code error')
+            }
     }
     async getEmail(req:Request, res: Response ){
         const emailParams = req.params.email
@@ -165,7 +153,6 @@ class UserController{
         res.json(updatePerson.rows[0])
     }
     async updateHomeBar(req: Request, res: Response){
-        debugger
         const id = req.params.id
         const {homebar} = req.body
         const sendHomeBar = await bd.query(
