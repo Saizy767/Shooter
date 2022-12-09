@@ -1,8 +1,8 @@
-import { Response } from 'express';
+import { response, Response } from 'express';
 import nodemailer from 'nodemailer';
 
 class MailService {
-    async sendToEmail(email:string, code:string,res?:Response){
+    async sendToEmail(email:string, code:string, response: Response){
         try{
             const transporter = nodemailer.createTransport({
                 port: 465,          
@@ -24,10 +24,10 @@ class MailService {
                 <br>This is code: ${code}</br>`
             }
             transporter.sendMail(MailData, () => {
-                res.status(200).json(`Code send to ${email}`)
+                response.status(200).json(`Code send to ${email}`)
         })
         }catch(err){
-            res.status(500).json('Mail sender error')
+            response.status(500).json('Mail sender error')
             throw Error
         }
     }

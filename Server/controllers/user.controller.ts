@@ -22,38 +22,26 @@ class UserController{
         }
         const securePassword = bscript.hashSync(password, 6)
         const activationCode = Math.floor(Math.random() * 999999).toString()
-        const id = await bd.query(
-            `INSERT INTO person (name, surname, email,
-                                password, favorites, homebar, 
-                                isActivated,tokenActivated, activatedCode)
-            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING id`,
-            [name, surname, email, securePassword, [], [], false, false, activationCode])
-        
-        res.status(201).json({message:'Account created', id: (id && id.rows[0]) || 'DB Created'})
-        mailService.sendToEmail(email, activationCode)
-    }
-    async registratePut(req: Request,res: Response){
-        const id = req.params.id
-        const error = validationResult(req) as unknown as ErrorVal
-        const {name, surname, email, password}:{name:string,
-                                                surname: string,
-                                                email: string,
-                                                password: string,
-                                                id:number} = req.body
-        if(error.errors.length){
-            return res.status(400).json(error.errors[0].msg)
+        const checkerEmail = await checkService.checkEmail(email)
+        if(checkerEmail){ // email and isActivated should be true
+            await bd.query(
+                `INSERT INTO person (name, surname, email,
+                                    password, favorites, homebar, 
+                                    isActivated,tokenActivated, activatedCode)
+                VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+                [name, surname, email, securePassword, [], [], false, false, activationCode])
+            
+            res.status(201).json({message:'Account created'})
         }
-        const securePassword = bscript.hashSync(password, 6)
-        const activationCode = Math.floor(Math.random() * 999999).toString()
-        await bd.query(
-            `UPDATE person SET (name, surname, email,
-                                password, favorites, homebar, 
-                                isActivated,tokenActivated, activatedCode) WHERE id= $9
-            VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
-            [name, surname, email, securePassword, [], [], false, false, activationCode, id])
-        bd.end()
-        res.status(200).json({message:'Account updated'})
-        mailService.sendToEmail(email, activationCode)
+        else{
+            await bd.query(
+                `UPDATE person SET name=$1, surname=$2,
+                                    password=$3, favorites=$4, homebar=$5, 
+                                    isActivated=$6,tokenActivated=$7, activatedCode=$8 WHERE email= $9`,
+                [name, surname, securePassword, [], [], false, false, activationCode, email])
+            res.status(200).json({message:'Account updated'})
+        }
+        mailService.sendToEmail(email, activationCode, res)
     }
     async login(req:Request, res: Response){
         const {email , password} = req.body
@@ -118,21 +106,25 @@ class UserController{
         }
         if (code === codeAuth.rows[0].activatedcode){
             await bd.query(`UPDATE person SET isActivated = $1 WHERE email = $2`,[true, email])
-            bd.end()
             res.status(200).json('Authorization code updated')
         }
         else{
             res.status(400).json('Authorization code error')
-            }
+        }
+        
     }
     async getEmail(req:Request, res: Response ){
         const emailParams = req.params.email
-        const emailDB = await bd.query(`SELECT email FROM person WHERE email = $1`,[emailParams])
-        checkService.checkEmail(emailDB.rows[0],emailParams)
+        if(checkService.checkEmail(emailParams)){
+            res.status(400).json('This email existing')
+        }
+        else{
+            res.status(200)
+        }
     }
     async getUsers(req: Request,res: Response){
         const users = await bd.query(`SELECT * FROM person`)
-        res.json(users.rows)
+        res.status(200).json(users && users.rows)
     }
     async deleteUser(req: Request,res: Response){
         const id = req.params.id
@@ -142,7 +134,7 @@ class UserController{
     async getOneUser(req: Request,res: Response){
         const id = req.params.id
         const user = await bd.query(`SELECT * FROM person WHERE id = $1`,[id])
-        res.json(user.rows)
+        res.status(200).json(user.rows)
     }
     async updateUser(req: Request,res: Response){
         const id = req.params.id
@@ -150,7 +142,7 @@ class UserController{
         const updatePerson = await bd.query(
             `UPDATE person SET name = $1, surname = $2 WHERE id = $3`,[name,surname,id]
         )
-        res.json(updatePerson.rows[0])
+        res.status(200).json(updatePerson && updatePerson.rows[0])
     }
     async updateHomeBar(req: Request, res: Response){
         const id = req.params.id

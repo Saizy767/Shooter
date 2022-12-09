@@ -1,14 +1,13 @@
-import { Response } from 'express';
+import bd from '../database/db'
 
 class checkService{
-    async checkEmail(emailDB: string, emailParams: string, res?:Response){
-        if(emailDB === emailParams){
-            res.status(400).json({message:'Email is existing',
-                                   email: emailDB
-            })
+    async checkEmail(email: string){
+        const emailDB = await bd.query(`SELECT email FROM person WHERE email = $1`,[email])
+        if((emailDB && emailDB.rows[0]?.email) === email){
+            return false
         }
         else{
-            res.status(200).json({message:'Email not existing', email:''})
+            return true
         }
     }
 }

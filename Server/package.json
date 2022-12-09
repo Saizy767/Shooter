@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "test": "jest --config --detectOpenHandles --watchAll --no-cache",
+    "test": "jest --detectOpenHandles --watchAll",
     "start": "nodemon index.ts"
   },
   "keywords": [],

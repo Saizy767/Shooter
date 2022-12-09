@@ -11,8 +11,6 @@ userRoute.post('/user/registration',
                 body('password').isLength({min:5}),
                 userController.registrate)
 
-userRoute.put('/user/registration/:id', userController.registratePut)
-
 userRoute.patch('/user/auth-code', 
                 body('email').isEmail(),
                 body('code').isLength({max:6}),
