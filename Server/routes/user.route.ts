@@ -22,11 +22,11 @@ userRoute.post('/user/send-mail',
                 
 userRoute.post('/user/login', userController.login)
 userRoute.delete('/user/:id', userController.deleteUser)
-userRoute.get('/user/:email', userController.getEmail)
+userRoute.get('/user/email/:email', userController.getEmail)
 userRoute.get('/user', userController.getUsers)
 userRoute.get('/user/:id', userController.getOneUser)
 userRoute.put('/user/:id', userController.updateUser)
-userRoute.put('/user/homebar/:id', userController.updateHomeBar)
+userRoute.patch('/user/homebar/:id', userController.updateHomeBar)
 
 export default userRoute
 

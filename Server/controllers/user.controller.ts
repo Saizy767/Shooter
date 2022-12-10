@@ -82,20 +82,15 @@ class UserController{
          }
     }
     async sendMail(req: Request, res: Response){
-        try{
             const {email} = req.body
             const error = validationResult(req) as unknown as ErrorVal
             const activationCode = Math.floor(Math.random() * 999999).toString()
-            if(error){
-                return res.status(400).json(error.errors[0].msg)
+            if(error.errors.length){
+                return res.status(400).json(error.errors[0])
             }
             await bd.query(`UPDATE person SET activatedCode=$1 WHERE email=$2`,[activationCode, email])
-            mailService.sendToEmail(email, activationCode, res)
-        }
-        catch(err){
-            res.status(500).json(err)
-            throw Error
-        }
+            mailService.sendToEmail(email, activationCode,res)
+        
     }
     async checkAuthCode(req: Request, res: Response){
         const {code, email} = req.body
@@ -142,15 +137,20 @@ class UserController{
         const updatePerson = await bd.query(
             `UPDATE person SET name = $1, surname = $2 WHERE id = $3`,[name,surname,id]
         )
-        res.status(200).json(updatePerson && updatePerson.rows[0])
+        res.status(200).json(updatePerson.rows[0])
     }
     async updateHomeBar(req: Request, res: Response){
         const id = req.params.id
         const {homebar} = req.body
-        const sendHomeBar = await bd.query(
-           `UPDATE person SET homebar = $1 WHERE id = $2`,[homebar,id]
+        const currentFavotires = await bd.query(
+            'SELECT homebar FROM person WHERE id = $1',[id]
         )
-        res.json(sendHomeBar.rows[0])
+        currentFavotires.rows[0].homebar.push(homebar)
+        const nextFavorites = currentFavotires.rows[0].homebar
+        const sendHomeBar = await bd.query(
+           'UPDATE person SET homebar = $1 WHERE id = $2',[nextFavorites,id]
+        )
+        res.status(200).json(sendHomeBar.rows)
     }
 }
 
