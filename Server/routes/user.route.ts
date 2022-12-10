@@ -27,6 +27,7 @@ userRoute.get('/user', userController.getUsers)
 userRoute.get('/user/:id', userController.getOneUser)
 userRoute.put('/user/:id', userController.updateUser)
 userRoute.patch('/user/homebar/:id', userController.updateHomeBar)
+userRoute.patch('/user/favorites/:id', userController.updataFavorites)
 
 export default userRoute
 

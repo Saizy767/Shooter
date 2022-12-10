@@ -41,7 +41,9 @@ class UserController{
                 [name, surname, securePassword, [], [], false, false, activationCode, email])
             res.status(200).json({message:'Account updated'})
         }
-        mailService.sendToEmail(email, activationCode, res)
+        if (process.env.NODE_ENV !== 'test') {
+            mailService.sendToEmail(email, activationCode)
+        }
     }
     async login(req:Request, res: Response){
         const {email , password} = req.body
@@ -89,7 +91,9 @@ class UserController{
                 return res.status(400).json(error.errors[0])
             }
             await bd.query(`UPDATE person SET activatedCode=$1 WHERE email=$2`,[activationCode, email])
-            mailService.sendToEmail(email, activationCode,res)
+            if (process.env.NODE_ENV !== 'test') {
+                mailService.sendToEmail(email, activationCode)
+            }
         
     }
     async checkAuthCode(req: Request, res: Response){
@@ -142,13 +146,26 @@ class UserController{
     async updateHomeBar(req: Request, res: Response){
         const id = req.params.id
         const {homebar} = req.body
-        const currentFavotires = await bd.query(
+        const currentHomeBar = await bd.query(
             'SELECT homebar FROM person WHERE id = $1',[id]
         )
-        currentFavotires.rows[0].homebar.push(homebar)
-        const nextFavorites = currentFavotires.rows[0].homebar
+        currentHomeBar.rows[0].homebar.push(homebar)
+        const nextHomeBar = currentHomeBar.rows[0].homebar
         const sendHomeBar = await bd.query(
-           'UPDATE person SET homebar = $1 WHERE id = $2',[nextFavorites,id]
+           'UPDATE person SET homebar = $1 WHERE id = $2',[nextHomeBar,id]
+        )
+        res.status(200).json(sendHomeBar.rows)
+    }
+    async updataFavorites(req: Request, res: Response){
+        const id = req.params.id
+        const {favorites} = req.body
+        const currentFavotires = await bd.query(
+            'SELECT favorites FROM person WHERE id = $1',[id]
+        )
+        currentFavotires.rows[0].favorites.push(favorites)
+        const nextFavorites = currentFavotires.rows[0].favorites
+        const sendHomeBar = await bd.query(
+           'UPDATE person SET favorites = $1 WHERE id = $2',[nextFavorites,id]
         )
         res.status(200).json(sendHomeBar.rows)
     }

@@ -4,8 +4,8 @@ create TABLE person(
     password VARCHAR(255),
     name VARCHAR(255),
     surname VARCHAR(255),
-    favorites json,
-    homebar json,
+    favorites JSON ARRAY,
+    homebar JSON ARRAY,
     isActivated boolean,
     tokenActivated boolean,
     activatedCode VARCHAR(6)

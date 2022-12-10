@@ -1,8 +1,7 @@
-import { response, Response } from 'express';
 import nodemailer from 'nodemailer';
 
 class MailService {
-    async sendToEmail(email:string, code:string, response: Response){
+    async sendToEmail(email:string, code:string){
         const transporter = nodemailer.createTransport({
             port: 465,          
             host: "smtp.gmail.com",
