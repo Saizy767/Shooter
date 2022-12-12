@@ -299,3 +299,63 @@ describe('send Authorization Code', function () {
             });
         }); });
 });
+describe('send to email', function () {
+    var user;
+    var res;
+    var testPool = new pg_1.Pool({
+        user: process.env.POOL_NAME,
+        host: process.env.HOST,
+        port: Number(process.env.DATAPORT),
+        database: process.env.TEST_DATANAME
+    });
+    beforeEach(function () { return __awaiter(void 0, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, testPool.query("CREATE TABLE person (\n      id SERIAL PRIMARY KEY,\n      email VARCHAR (75) UNIQUE,\n      password VARCHAR(255),\n      name VARCHAR(255),\n      surname VARCHAR(255),\n      favorites JSON ARRAY,\n      homebar JSON ARRAY,\n      isActivated boolean,\n      tokenActivated boolean,\n      activatedCode VARCHAR(6));")];
+                case 1:
+                    _a.sent();
+                    user = { name: 'Mike', surname: 'Dark', email: 'qwerty@gmail.com', password: 'qwertyqwert' };
+                    return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api/user/registration').send(user)];
+                case 2:
+                    res = _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    afterEach(function () { return __awaiter(void 0, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    jest.clearAllMocks();
+                    return [4 /*yield*/, testPool.query('DROP TABLE person;')];
+                case 1:
+                    _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    it('should send code to email', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var response;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api/user/send-mail').send({ email: user.email })];
+                case 1:
+                    response = _a.sent();
+                    expect(response.body).toBe("Send to " + user.email);
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    it('should return error of invalid email', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var response;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api/user/send-mail').send({ email: '12' })];
+                case 1:
+                    response = _a.sent();
+                    expect(response.body).toBe("Invalid value");
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+});

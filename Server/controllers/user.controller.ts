@@ -85,16 +85,17 @@ class UserController{
          }
     }
     async sendMail(req: Request, res: Response){
-            const {email} = req.body
-            const error = validationResult(req) as unknown as ErrorVal
-            const activationCode = Math.floor(Math.random() * 999999).toString()
-            if(error.errors.length){
-                return res.status(400).json(error.errors[0])
-            }
-            await bd.query(`UPDATE person SET activatedCode=$1 WHERE email=$2`,[activationCode, email])
-            if (process.env.NODE_ENV !== 'test') {
-                await mailService.sendToEmail(email, activationCode)
-            }
+        const {email} = req.body
+        const error = validationResult(req) as unknown as ErrorVal
+        const activationCode = Math.floor(Math.random() * 999999).toString()
+        if(error.errors.length){
+            return res.status(400).json(error.errors[0].msg)
+        }
+        await bd.query(`UPDATE person SET activatedCode=$1 WHERE email=$2`,[activationCode, email])
+        if (process.env.NODE_ENV !== 'test') {
+            await mailService.sendToEmail(email, activationCode)
+        }
+        res.status(200).json(`Send to ${email}`)
         
     }
     async sendAuthCode(req: Request, res: Response){

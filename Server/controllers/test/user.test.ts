@@ -142,3 +142,40 @@ describe('send Authorization Code', () => {
   })
 })
 
+describe('send to email', () => {
+  let user:{name:string, surname: string, email: string, password:string}
+  let res: request.Response
+  const testPool = new Pool({
+    user: process.env.POOL_NAME,
+    host: process.env.HOST,
+    port: Number(process.env.DATAPORT),
+    database: process.env.TEST_DATANAME
+  })
+  beforeEach( async ()=>{
+    await testPool.query(`CREATE TABLE person (
+      id SERIAL PRIMARY KEY,
+      email VARCHAR (75) UNIQUE,
+      password VARCHAR(255),
+      name VARCHAR(255),
+      surname VARCHAR(255),
+      favorites JSON ARRAY,
+      homebar JSON ARRAY,
+      isActivated boolean,
+      tokenActivated boolean,
+      activatedCode VARCHAR(6));`)
+    user = {name:'Mike', surname:'Dark' , email: 'qwerty@gmail.com', password: 'qwertyqwert'};
+    res = await request(app).post('/api/user/registration').send(user)
+  })
+  afterEach( async () => {
+    jest.clearAllMocks();
+    await testPool.query('DROP TABLE person;')
+  });
+  it('should send code to email', async () => {
+    const response = await request(app).post('/api/user/send-mail').send({email:user.email})
+    expect(response.body).toBe(`Send to ${user.email}`)
+  })
+  it('should return error of invalid email', async () => {
+    const response = await request(app).post('/api/user/send-mail').send({email:'12'})
+    expect(response.body).toBe(`Invalid value`)
+  })
+})
