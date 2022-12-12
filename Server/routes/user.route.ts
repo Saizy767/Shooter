@@ -1,6 +1,6 @@
 import {Router} from 'express'
 import userController from '../controllers/user.controller'
-import {body} from 'express-validator'
+import {body, param} from 'express-validator'
 
 const userRoute = Router()
 
@@ -21,7 +21,8 @@ userRoute.post('/user/send-mail',
                 userController.sendMail)
                 
 userRoute.post('/user/login', userController.login)
-userRoute.delete('/user/:id', userController.deleteUser)
+userRoute.delete('/user/:id',
+                 userController.deleteUser)
 userRoute.get('/user/email/:email', userController.getEmail)
 userRoute.get('/user', userController.getUsers)
 userRoute.get('/user/:id', userController.getOneUser)

@@ -1,5 +1,5 @@
 import { Pool } from "pg";
-import request from "supertest";
+import request from 'supertest';
 import {app} from "../../index";
 
 describe('registration',() => {
@@ -29,7 +29,10 @@ describe('registration',() => {
     it('should response Account created', async () => {
         const user = { name:'Mike', surname:'Dark' , email: 'qwerty@gmail.com', password: 'qwerty'};
         const newUser = { name:'Mikes', surname:'Ligth' , email: 'qwerty@gmail.com', password: 'qwerty123'};
-        const response = await request(app).post("/api/user/registration").send(user).then((data)=>{return data.body});
+        const response = await request(app)
+                               .post("/api/user/registration")
+                               .send(user)
+                               .then((data)=>{return data.body});
         const repeat = await request(app)
                              .post("/api/user/registration")
                              .send(newUser)
@@ -177,5 +180,46 @@ describe('send to email', () => {
   it('should return error of invalid email', async () => {
     const response = await request(app).post('/api/user/send-mail').send({email:'12'})
     expect(response.body).toBe(`Invalid value`)
+  })
+})
+
+describe('delete user', () => {
+  let user:{name:string, surname: string, email: string, password:string}
+  let res: request.Response
+  const testPool = new Pool({
+    user: process.env.POOL_NAME,
+    host: process.env.HOST,
+    port: Number(process.env.DATAPORT),
+    database: process.env.TEST_DATANAME
+  })
+  beforeEach( async ()=>{
+    await testPool.query(`CREATE TABLE person (
+      id SERIAL PRIMARY KEY,
+      email VARCHAR (75) UNIQUE,
+      password VARCHAR(255),
+      name VARCHAR(255),
+      surname VARCHAR(255),
+      favorites JSON ARRAY,
+      homebar JSON ARRAY,
+      isActivated boolean,
+      tokenActivated boolean,
+      activatedCode VARCHAR(6));`)
+    user = {name:'Mike', surname:'Dark' , email: 'qwerty@gmail.com', password: 'qwertyqwert'};
+    res = await request(app).post('/api/user/registration').send(user)
+  })
+  afterEach( async () => {
+    jest.clearAllMocks();
+    await testPool.query('DROP TABLE person;')
+  });
+  it('should return of success deleting', async () => {
+    const id = 1
+    const response = await request(app).delete(`/api/user/${id}`).send({id})
+    expect(response.body).toBe(`User ${id} deleted`)
+  })
+  it('should return of error deleting', async () => {
+    const id = 2
+    const getUser = await request(app).get(`/api/user/${id}`)
+    const response = await request(app).delete(`/api/user/${id}`).send({id})
+    expect(response.body).toBe(`User ${id} is not existing`)
   })
 })

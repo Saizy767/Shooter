@@ -1,4 +1,4 @@
-import request from "supertest"
+import request from 'supertest';
 import { Pool } from 'pg';
 import checkService from '../checker-service'
 import { app } from "../../index";
@@ -36,19 +36,27 @@ describe('checker service', ()=>{
     });
     it('checker-email should return true',async ()=>{
         const emailCheck = await checkService.checkEmail('qwerty1@gmail.com')
-        expect(emailCheck).toBe(true)
+        expect(emailCheck).toBeTruthy()
     }),
     it('checker-email should return false', async () =>{
         const emailCheck = await checkService.checkEmail(user.email)
-        expect(emailCheck).toBe(false)
+        expect(emailCheck).toBeFalsy()
     }),
     it('checker-code should return false',async ()=>{
         const emailCheck = await checkService.checkCode({email:user.email,code:'123456'})
-        expect(emailCheck).toBe(false)
+        expect(emailCheck).toBeFalsy()
     }),
     it('checker-code should return true', async () =>{
         const getUser = await request(app).get('/api/user/1')
         const emailCheck = await checkService.checkCode({email:user.email, code:getUser.body[0].activatedcode})
-        expect(emailCheck).toBe(true)
+        expect(emailCheck).toBeTruthy()
+    }),
+    it('checker-id should return true', async () => {
+        const IDCheck = await checkService.checkID({id:'1'})
+        expect(IDCheck).toBeTruthy()
+    })
+    it('checker-id should return false', async () => {
+        const IDCheck = await checkService.checkID({id:'2'})
+        expect(IDCheck).toBeFalsy()
     })
 })

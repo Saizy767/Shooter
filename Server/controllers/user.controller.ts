@@ -128,8 +128,14 @@ class UserController{
     }
     async deleteUser(req: Request,res: Response){
         const id = req.params.id
-        const user = await bd.query('DELETE FROM person WHERE id = $1',[id])
-        res.json(user.rows)
+        const checkID = await checkService.checkID({id})
+        if(checkID){
+            const user = await bd.query('DELETE FROM person WHERE id = $1',[id])
+            res.status(200).json(`User ${id} deleted`)
+        }
+        else{
+            res.status(400).json(`User ${id} is not existing`)
+        }
     }
     async getOneUser(req: Request,res: Response){
         const id = req.params.id
