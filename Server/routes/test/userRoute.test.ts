@@ -88,16 +88,10 @@ describe('user routes',()=>{
     }),
     test('PUT /user/homebar/:id', async () => {
         const response = await request(app).patch('/api/user/homebar/1').send({homebar:{coctail:'Pinokolada'}})
-        /*await request(app).patch('/api/user/homebar/1').send({homebar:{coctail:'B52'}})
-        const response = await request(app).get('/api/user/1')
-        expect(response.body[0].homebar).toStrictEqual([{coctail:'Pinokolada'},{coctail:'B52'}])*/
         expect(response.status).toBe(200)
     })
     test('PUT /user/favorites/:id', async () => {
         const response = await request(app).patch('/api/user/favorites/1').send({favorites:{coctail:'Pinokolada'}})
-        /*await request(app).patch('/api/user/favorites/1').send({favorites:{coctail:'B52'}})
-        const response = await request(app).get('/api/user/1')
-        expect(response.body[0].favorites).toStrictEqual([{coctail:'Pinokolada'},{coctail:'B52'}])*/
         expect(response.status).toBe(200)
     })
 })

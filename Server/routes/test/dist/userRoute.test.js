@@ -195,16 +195,9 @@ describe('user routes', function () {
             var response;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).patch('/api/user/homebar/1').send({ homebar: { coctail: 'Pinokolada' } })
-                        /*await request(app).patch('/api/user/homebar/1').send({homebar:{coctail:'B52'}})
-                        const response = await request(app).get('/api/user/1')
-                        expect(response.body[0].homebar).toStrictEqual([{coctail:'Pinokolada'},{coctail:'B52'}])*/
-                    ];
+                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).patch('/api/user/homebar/1').send({ homebar: { coctail: 'Pinokolada' } })];
                     case 1:
                         response = _a.sent();
-                        /*await request(app).patch('/api/user/homebar/1').send({homebar:{coctail:'B52'}})
-                        const response = await request(app).get('/api/user/1')
-                        expect(response.body[0].homebar).toStrictEqual([{coctail:'Pinokolada'},{coctail:'B52'}])*/
                         expect(response.status).toBe(200);
                         return [2 /*return*/];
                 }
@@ -214,16 +207,9 @@ describe('user routes', function () {
         var response;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).patch('/api/user/favorites/1').send({ favorites: { coctail: 'Pinokolada' } })
-                    /*await request(app).patch('/api/user/favorites/1').send({favorites:{coctail:'B52'}})
-                    const response = await request(app).get('/api/user/1')
-                    expect(response.body[0].favorites).toStrictEqual([{coctail:'Pinokolada'},{coctail:'B52'}])*/
-                ];
+                case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).patch('/api/user/favorites/1').send({ favorites: { coctail: 'Pinokolada' } })];
                 case 1:
                     response = _a.sent();
-                    /*await request(app).patch('/api/user/favorites/1').send({favorites:{coctail:'B52'}})
-                    const response = await request(app).get('/api/user/1')
-                    expect(response.body[0].favorites).toStrictEqual([{coctail:'Pinokolada'},{coctail:'B52'}])*/
                     expect(response.status).toBe(200);
                     return [2 /*return*/];
             }
