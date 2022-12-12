@@ -7,6 +7,7 @@ import * as bscript from 'bcryptjs'
 import checkService from '../service/checker-service';
 import {validationResult} from 'express-validator'
 import { ErrorVal } from '../models/user-modules';
+import { error } from 'console';
 
 dotenv.config()
 
@@ -42,7 +43,7 @@ class UserController{
             res.status(200).json({message:'Account updated'})
         }
         if (process.env.NODE_ENV !== 'test') {
-            mailService.sendToEmail(email, activationCode)
+            await mailService.sendToEmail(email, activationCode)
         }
     }
     async login(req:Request, res: Response){
@@ -60,8 +61,8 @@ class UserController{
             "status": "Logged in",
             "accessToken": accessToken,
             "refreshToken": refreshToken
-        }                                   // send to postgres status, accessToken and refreshToken
-        tokenList[refreshToken] = response// send refreshToken to client
+        }                                  
+        tokenList[refreshToken] = response // send refreshToken to client
         res.status(200).json(response)
     }
     async getToken(req: Request, res: Response){
@@ -92,25 +93,24 @@ class UserController{
             }
             await bd.query(`UPDATE person SET activatedCode=$1 WHERE email=$2`,[activationCode, email])
             if (process.env.NODE_ENV !== 'test') {
-                mailService.sendToEmail(email, activationCode)
+                await mailService.sendToEmail(email, activationCode)
             }
         
     }
-    async checkAuthCode(req: Request, res: Response){
-        const {code, email} = req.body
+    async sendAuthCode(req: Request, res: Response){
+        const {code, email}:{code:string, email:string} = req.body
         const error = validationResult(req) as unknown as ErrorVal
-        const codeAuth = await bd.query(`SELECT activatedCode FROM person WHERE email=$1`,[email])
         if(error.errors.length){
             return res.status(400).json(error.errors[0].msg)
         }
-        if (code === codeAuth.rows[0].activatedcode){
-            await bd.query(`UPDATE person SET isActivated = $1 WHERE email = $2`,[true, email])
+        const CompareCode = await checkService.checkCode({email, code})
+        if (CompareCode){
+            await bd.query(`UPDATE person SET isActivated = $1, tokenActivated = $2 WHERE email = $3`,[true, true, email])
             res.status(200).json('Authorization code updated')
         }
         else{
             res.status(400).json('Authorization code error')
         }
-        
     }
     async getEmail(req:Request, res: Response ){
         const emailParams = req.params.email

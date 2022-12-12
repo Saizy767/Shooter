@@ -3,7 +3,7 @@ import { Pool } from 'pg';
 import checkService from '../checker-service'
 import { app } from "../../index";
 
-describe('checker email', ()=>{
+describe('checker service', ()=>{
     const mPool = jest.mock('../../database/db');
     const testPool = new Pool({
         user: process.env.POOL_NAME,
@@ -11,6 +11,9 @@ describe('checker email', ()=>{
         port: Number(process.env.DATAPORT),
         database: process.env.TEST_DATANAME
     });
+    let user:{name:string, surname: string, email: string, password:string}
+    let res: request.Response
+
     beforeEach(async () => {
         await testPool.query(`CREATE TABLE person (
             id SERIAL PRIMARY KEY,
@@ -24,19 +27,28 @@ describe('checker email', ()=>{
             tokenActivated boolean,
             activatedCode VARCHAR(6))`)
         mPool.fn().mockRejectedValueOnce
+        user = {name:'Mike', surname:'Dark' , email: 'qwerty@gmail.com', password: 'qwertyqwert'};
+        res = await request(app).post('/api/user/registration').send(user)
       });
     afterEach(async () => {
         jest.clearAllMocks();
         await testPool.query('DROP TABLE person')
     });
-    it('should return true',async ()=>{
-        const emailCheck = await checkService.checkEmail('qwerty@gmail.com')
+    it('checker-email should return true',async ()=>{
+        const emailCheck = await checkService.checkEmail('qwerty1@gmail.com')
         expect(emailCheck).toBe(true)
     }),
-    it('should return false', async () =>{
-        const user = {name:'Mike', surname:'Dark' , email: 'qwerty@gmail.com', password: 'qwertyqwert'};
-        await request(app).post('/api/user/registration').send(user)
+    it('checker-email should return false', async () =>{
         const emailCheck = await checkService.checkEmail(user.email)
         expect(emailCheck).toBe(false)
+    }),
+    it('checker-code should return false',async ()=>{
+        const emailCheck = await checkService.checkCode({email:user.email,code:'123456'})
+        expect(emailCheck).toBe(false)
+    }),
+    it('checker-code should return true', async () =>{
+        const getUser = await request(app).get('/api/user/1')
+        const emailCheck = await checkService.checkCode({email:user.email, code:getUser.body[0].activatedcode})
+        expect(emailCheck).toBe(true)
     })
 })

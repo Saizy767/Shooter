@@ -13,8 +13,8 @@ userRoute.post('/user/registration',
 
 userRoute.patch('/user/auth-code', 
                 body('email').isEmail(),
-                body('code').isLength({max:6}),
-                userController.checkAuthCode)
+                body('code').isLength({ min:1, max:6}),
+                userController.sendAuthCode)
 
 userRoute.post('/user/send-mail',
                 body('email').isEmail(),
