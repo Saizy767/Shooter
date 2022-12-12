@@ -7,7 +7,6 @@ import * as bscript from 'bcryptjs'
 import checkService from '../service/checker-service';
 import {validationResult} from 'express-validator'
 import { ErrorVal } from '../models/user-modules';
-import { error } from 'console';
 
 dotenv.config()
 
@@ -114,17 +113,22 @@ class UserController{
         }
     }
     async getEmail(req:Request, res: Response ){
-        const emailParams = req.params.email
-        if(checkService.checkEmail(emailParams)){
-            res.status(400).json('This email existing')
+        const email = req.params.email
+        const error = validationResult(req) as unknown as ErrorVal
+        const checkEmail = await checkService.checkEmail(email)
+        if(error.errors.length){
+            return res.status(400).json(error.errors[0].msg)
+        }
+        if(!checkEmail){
+            res.status(400).json(`${email} is existing`)
         }
         else{
-            res.status(200)
+            res.status(200).json(`${email} is not existing`)
         }
     }
     async getUsers(req: Request,res: Response){
         const users = await bd.query(`SELECT * FROM person`)
-        res.status(200).json(users && users.rows)
+        res.status(200).json(users.rows)
     }
     async deleteUser(req: Request,res: Response){
         const id = req.params.id
@@ -139,42 +143,91 @@ class UserController{
     }
     async getOneUser(req: Request,res: Response){
         const id = req.params.id
-        const user = await bd.query(`SELECT * FROM person WHERE id = $1`,[id])
-        res.status(200).json(user.rows)
+        const error = validationResult(req) as unknown as ErrorVal
+
+        if(error.errors.length){
+            return res.status(400).json(error.errors[0].msg)
+        }
+
+        const checkID = await checkService.checkID({id})
+
+        if(checkID){
+            const user = await bd.query(`SELECT * FROM person WHERE id = $1`,[id])
+            res.status(200).json(user.rows)
+        }
+        else{ 
+            res.status(400).json('This ID not exsist')
+        }
     }
     async updateUser(req: Request,res: Response){
         const id = req.params.id
-        const {name, surname} = req.body
+        const {name, surname}:{name:string, surname: string} = req.body
+        const error = validationResult(req) as unknown as ErrorVal
+        if(error.errors.length){
+            return res.status(400).json(error.errors[0].msg)
+        }
+
+        const checkID = await checkService.checkID({id})
+
+        if(checkID){
         const updatePerson = await bd.query(
-            `UPDATE person SET name = $1, surname = $2 WHERE id = $3`,[name,surname,id]
-        )
+            `UPDATE person SET name = $1, surname = $2 WHERE id = $3`,[name,surname,id])
         res.status(200).json(updatePerson.rows[0])
+        }
+        else{
+            res.status(400).json('This ID not exsist')
+        }
     }
     async updateHomeBar(req: Request, res: Response){
         const id = req.params.id
         const {homebar} = req.body
-        const currentHomeBar = await bd.query(
-            'SELECT homebar FROM person WHERE id = $1',[id]
-        )
-        currentHomeBar.rows[0].homebar.push(homebar)
-        const nextHomeBar = currentHomeBar.rows[0].homebar
-        const sendHomeBar = await bd.query(
-           'UPDATE person SET homebar = $1 WHERE id = $2',[nextHomeBar,id]
-        )
-        res.status(200).json(sendHomeBar.rows)
+        const error = validationResult(req) as unknown as ErrorVal
+
+        if(error.errors.length){
+            return res.status(400).json(error.errors[0].msg)
+        }
+
+        const checkID = await checkService.checkID({id})
+
+        if(checkID){
+            const currentHomeBar = await bd.query(
+                'SELECT homebar FROM person WHERE id = $1',[id]
+            )
+            currentHomeBar.rows[0].homebar.push(homebar)
+            const nextHomeBar = currentHomeBar.rows[0].homebar
+            const sendHomeBar = await bd.query(
+            'UPDATE person SET homebar = $1 WHERE id = $2',[nextHomeBar,id]
+            )
+            res.status(200).json(sendHomeBar.rows)
+        }
+        else{ 
+            res.status(400).json('This ID not exsist')
+        }
     }
     async updataFavorites(req: Request, res: Response){
         const id = req.params.id
         const {favorites} = req.body
-        const currentFavotires = await bd.query(
-            'SELECT favorites FROM person WHERE id = $1',[id]
-        )
-        currentFavotires.rows[0].favorites.push(favorites)
-        const nextFavorites = currentFavotires.rows[0].favorites
-        const sendHomeBar = await bd.query(
-           'UPDATE person SET favorites = $1 WHERE id = $2',[nextFavorites,id]
-        )
-        res.status(200).json(sendHomeBar.rows)
+        const error = validationResult(req) as unknown as ErrorVal
+
+        if(error.errors.length){
+            return res.status(400).json(error.errors[0].msg)
+        }
+
+        const checkID = await checkService.checkID({id})
+
+        if(checkID){
+            const currentFavotires = await bd.query(
+                'SELECT favorites FROM person WHERE id = $1',[id]
+            )
+            currentFavotires.rows[0].favorites.push(favorites)
+            const nextFavorites = currentFavotires.rows[0].favorites
+            const sendHomeBar = await bd.query(
+               'UPDATE person SET favorites = $1 WHERE id = $2',[nextFavorites,id]
+            )
+            res.status(200).json(sendHomeBar.rows)
+        }else{ 
+            res.status(400).json('This ID not exsist')
+        }
     }
 }
 

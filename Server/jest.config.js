@@ -4,5 +4,5 @@ module.exports = {
   transform: {
     '^.+\\.ts?$': 'ts-jest',
   },
-  transformIgnorePatterns: ["src"],
+  transformIgnorePatterns: ["<rootDir>/build/", "<rootDir>/node_modules/"],
 };

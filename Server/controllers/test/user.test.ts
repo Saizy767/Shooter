@@ -223,3 +223,292 @@ describe('delete user', () => {
     expect(response.body).toBe(`User ${id} is not existing`)
   })
 })
+
+describe('send email for check of existing', () => {
+  let user:{name:string, surname: string, email: string, password:string}
+  let res: request.Response
+  const testPool = new Pool({
+    user: process.env.POOL_NAME,
+    host: process.env.HOST,
+    port: Number(process.env.DATAPORT),
+    database: process.env.TEST_DATANAME
+  })
+  beforeEach( async ()=>{
+    await testPool.query(`CREATE TABLE person (
+      id SERIAL PRIMARY KEY,
+      email VARCHAR (75) UNIQUE,
+      password VARCHAR(255),
+      name VARCHAR(255),
+      surname VARCHAR(255),
+      favorites JSON ARRAY,
+      homebar JSON ARRAY,
+      isActivated boolean,
+      tokenActivated boolean,
+      activatedCode VARCHAR(6));`)
+    user = {name:'Mike', surname:'Dark' , email: 'qwerty@gmail.com', password: 'qwertyqwert'};
+    res = await request(app).post('/api/user/registration').send(user)
+  })
+  afterEach( async () => {
+    jest.clearAllMocks();
+    await testPool.query('DROP TABLE person;')
+  });
+  it('should return existing email', async () => {
+    const response = await request(app).get(`/api/user/email/${user.email}`)
+    expect(response.body).toBe(`${user.email} is existing`)
+  }),
+  it('should return email isnt existing', async () => {
+    const email = 'qwertyu@gmail.com'
+    const response = await request(app).get(`/api/user/email/${email}`)
+    expect(response.body).toBe(`${email} is not existing`)
+  }),
+  it('should return error of invalid email', async () => {
+    const email = 'qwerqwas@sadas'
+    const response = await request(app).get(`/api/user/email/${email}`)
+    expect(response.body).toBe(`Invalid value`)
+  })
+})
+
+describe('get all users', () => {
+  let user:{name:string, surname: string, email: string, password:string}
+  let res: request.Response
+  const testPool = new Pool({
+    user: process.env.POOL_NAME,
+    host: process.env.HOST,
+    port: Number(process.env.DATAPORT),
+    database: process.env.TEST_DATANAME
+  })
+  beforeEach( async ()=>{
+    await testPool.query(`CREATE TABLE person (
+      id SERIAL PRIMARY KEY,
+      email VARCHAR (75) UNIQUE,
+      password VARCHAR(255),
+      name VARCHAR(255),
+      surname VARCHAR(255),
+      favorites JSON ARRAY,
+      homebar JSON ARRAY,
+      isActivated boolean,
+      tokenActivated boolean,
+      activatedCode VARCHAR(6));`)
+    user = {name:'Mike', surname:'Dark' , email: 'qwerty@gmail.com', password: 'qwertyqwert'};
+    res = await request(app).post('/api/user/registration').send(user)
+  })
+  afterEach( async () => {
+    jest.clearAllMocks();
+    await testPool.query('DROP TABLE person;')
+  });
+  it('should return all users', async () => {
+    const response = await request(app).get('/api/user')
+    expect(response.body[0]).toMatchObject({
+      "email": user.email,
+      "name": user.name,
+      "tokenactivated": false,
+      "surname": user.surname,
+      "isactivated": false
+  })
+  })
+})
+
+describe('get one user by ID' , () => {
+  let user:{name:string, surname: string, email: string, password:string}
+  let res: request.Response
+  const testPool = new Pool({
+    user: process.env.POOL_NAME,
+    host: process.env.HOST,
+    port: Number(process.env.DATAPORT),
+    database: process.env.TEST_DATANAME
+  })
+  beforeEach( async ()=>{
+    await testPool.query(`CREATE TABLE person (
+      id SERIAL PRIMARY KEY,
+      email VARCHAR (75) UNIQUE,
+      password VARCHAR(255),
+      name VARCHAR(255),
+      surname VARCHAR(255),
+      favorites JSON ARRAY,
+      homebar JSON ARRAY,
+      isActivated boolean,
+      tokenActivated boolean,
+      activatedCode VARCHAR(6));`)
+    user = {name:'Mike', surname:'Dark' , email: 'qwerty@gmail.com', password: 'qwertyqwert'};
+    res = await request(app).post('/api/user/registration').send(user)
+  })
+  afterEach( async () => {
+    jest.clearAllMocks();
+    await testPool.query('DROP TABLE person;')
+  });
+  it('should find user', async () => {
+    const response = await request(app).get('/api/user/1')
+    expect(response.body[0]).toMatchObject({
+            "email": user.email,
+            "name": user.name,
+            "tokenactivated": false,
+            "surname": user.surname,
+            "isactivated": false
+        })
+  }),
+  it('should dont find user', async () => {
+    const response = await request(app).get('/api/user/2')
+    expect(response.body).toBe('This ID not exsist')
+  })
+  it('should return error cause ID is NaN', async () => {
+    const response = await request(app).get('/api/user/asd')
+    expect(response.body).toBe('Invalid value')
+  })
+})
+
+describe('updating user by ID', () => {
+  let user:{name:string, surname: string, email: string, password:string}
+  let res: request.Response
+  const testPool = new Pool({
+    user: process.env.POOL_NAME,
+    host: process.env.HOST,
+    port: Number(process.env.DATAPORT),
+    database: process.env.TEST_DATANAME
+  })
+  beforeEach( async ()=>{
+    await testPool.query(`CREATE TABLE person (
+      id SERIAL PRIMARY KEY,
+      email VARCHAR (75) UNIQUE,
+      password VARCHAR(255),
+      name VARCHAR(255),
+      surname VARCHAR(255),
+      favorites JSON ARRAY,
+      homebar JSON ARRAY,
+      isActivated boolean,
+      tokenActivated boolean,
+      activatedCode VARCHAR(6));`)
+    user = {name:'Mike', surname:'Dark' , email: 'qwerty@gmail.com', password: 'qwertyqwert'};
+    res = await request(app).post('/api/user/registration').send(user)
+  })
+  afterEach( async () => {
+    jest.clearAllMocks();
+    await testPool.query('DROP TABLE person;')
+  });
+  it('should update user', async () => {
+    const updatedCharecters = {name:'Lucka', surname:'Host'}
+    await request(app).put('/api/user/1').send(updatedCharecters)
+    const response = await request(app).get('/api/user/1')
+    expect(response.body[0]).toMatchObject({
+            name: updatedCharecters.name,
+            surname: updatedCharecters.surname,
+            email: user.email,
+        })
+  }),
+  it('should send error of extraneous parameter', async () => {
+    const updatedCharecters = {name:'Lucka', email:'qwertyu@gmail.com'}
+    const response = await request(app).put('/api/user/1').send(updatedCharecters)
+    expect(response.body).toBe('Invalid value')
+  })
+  it('should send error by empty name', async () => {
+    const updatedCharecters = {name:'', surname:'Host'}
+    const response = await request(app).put('/api/user/1').send(updatedCharecters)
+    expect(response.body).toBe('Invalid value')
+  })
+  it('should send error by empty surname', async () => {
+    const updatedCharecters = {name:'Lucka', surname:';'}
+    const response = await request(app).put('/api/user/1').send(updatedCharecters)
+    expect(response.body).toBe('Invalid value')
+  })
+  it('should send error by invalid ID', async () => {
+    const updatedCharecters = {name:'Lucka', surname:'Host'}
+    const response = await request(app).put('/api/user/qwer').send(updatedCharecters)
+    expect(response.body).toBe('Invalid value')
+  })
+  it('should send error by not existing ID', async () => {
+    const updatedCharecters = {name:'Lucka', surname:'Host'}
+    const response = await request(app).put('/api/user/12').send(updatedCharecters)
+    expect(response.body).toBe('This ID not exsist')
+  })
+})
+
+describe('adding to user homebar', () => {
+  let user:{name:string, surname: string, email: string, password:string}
+  const testPool = new Pool({
+    user: process.env.POOL_NAME,
+    host: process.env.HOST,
+    port: Number(process.env.DATAPORT),
+    database: process.env.TEST_DATANAME
+  })
+  beforeEach( async ()=>{
+    await testPool.query(`CREATE TABLE person (
+      id SERIAL PRIMARY KEY,
+      email VARCHAR (75) UNIQUE,
+      password VARCHAR(255),
+      name VARCHAR(255),
+      surname VARCHAR(255),
+      favorites JSON ARRAY,
+      homebar JSON ARRAY,
+      isActivated boolean,
+      tokenActivated boolean,
+      activatedCode VARCHAR(6));`)
+    user = {name:'Mike', surname:'Dark' , email: 'qwerty@gmail.com', password: 'qwertyqwert'};
+    await request(app).post('/api/user/registration').send(user)
+  })
+  afterEach( async () => {
+    jest.clearAllMocks();
+    await testPool.query('DROP TABLE person;')
+  });
+  it('should adding 2 coctails', async () => {
+    await request(app).patch('/api/user/homebar/1').send({homebar:{coctail:'Pinokolada'}})
+    await request(app).patch('/api/user/homebar/1').send({homebar:{coctail:'B52'}})
+    const responseGet = await request(app).get('/api/user/1')
+    expect(responseGet.body[0].homebar).toStrictEqual([{coctail:'Pinokolada'},{coctail:'B52'}])
+  }),
+  it('should adding one coctail of 2', async () => {
+    await request(app).patch('/api/user/homebar/1').send({homebar:{coctail:'Pinokolada'}})
+    const errorReq = await request(app).patch('/api/user/homebar/1').send({homebar:{coctail:''}})
+    const responseGet = await request(app).get('/api/user/1')
+    expect(responseGet.body[0].homebar).toStrictEqual([{coctail:'Pinokolada'}])
+    expect(errorReq.body).toBe('Invalid value')
+  }),
+  it('should send error by invalid ID', async () => {
+    const response = await request(app).patch('/api/user/homebar/qwe').send({homebar:{coctail:'Pinokolada'}})
+    expect(response.body).toBe('Invalid value')
+  })
+})
+
+describe('adding to user favorites', () => {
+  let user:{name:string, surname: string, email: string, password:string}
+  const testPool = new Pool({
+    user: process.env.POOL_NAME,
+    host: process.env.HOST,
+    port: Number(process.env.DATAPORT),
+    database: process.env.TEST_DATANAME
+  })
+  beforeEach( async ()=>{
+    await testPool.query(`CREATE TABLE person (
+      id SERIAL PRIMARY KEY,
+      email VARCHAR (75) UNIQUE,
+      password VARCHAR(255),
+      name VARCHAR(255),
+      surname VARCHAR(255),
+      favorites JSON ARRAY,
+      homebar JSON ARRAY,
+      isActivated boolean,
+      tokenActivated boolean,
+      activatedCode VARCHAR(6));`)
+    user = {name:'Mike', surname:'Dark' , email: 'qwerty@gmail.com', password: 'qwertyqwert'};
+    await request(app).post('/api/user/registration').send(user)
+  })
+  afterEach( async () => {
+    jest.clearAllMocks();
+    await testPool.query('DROP TABLE person;')
+  });
+  it('should adding 2 coctails', async () => {
+    await request(app).patch('/api/user/favorites/1').send({favorites:{coctail:'Pinokolada'}})
+    await request(app).patch('/api/user/favorites/1').send({favorites:{coctail:'B52'}})
+    const responseGet = await request(app).get('/api/user/1')
+    expect(responseGet.body[0].favorites).toStrictEqual([{coctail:'Pinokolada'},{coctail:'B52'}])
+  }),
+  it('should adding one coctail of 2', async () => {
+    await request(app).patch('/api/user/favorites/1').send({favorites:{coctail:'Pinokolada'}})
+    const errorReq = await request(app).patch('/api/user/favorites/1').send({favorites:{coctail:''}})
+    const responseGet = await request(app).get('/api/user/1')
+    expect(responseGet.body[0].favorites).toStrictEqual([{coctail:'Pinokolada'}])
+    expect(errorReq.body).toBe('Invalid value')
+  }),
+  it('should send error by invalid ID', async () => {
+    const response = await request(app).patch('/api/user/favorites/qwe').send({favorites:{coctail:'Pinokolada'}})
+    expect(response.body).toBe('Invalid value')
+  })
+})

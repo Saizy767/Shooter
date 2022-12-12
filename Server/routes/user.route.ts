@@ -23,12 +23,26 @@ userRoute.post('/user/send-mail',
 userRoute.post('/user/login', userController.login)
 userRoute.delete('/user/:id',
                  userController.deleteUser)
-userRoute.get('/user/email/:email', userController.getEmail)
+userRoute.get('/user/email/:email',
+               param('email').isEmail(),
+               userController.getEmail)
 userRoute.get('/user', userController.getUsers)
-userRoute.get('/user/:id', userController.getOneUser)
-userRoute.put('/user/:id', userController.updateUser)
-userRoute.patch('/user/homebar/:id', userController.updateHomeBar)
-userRoute.patch('/user/favorites/:id', userController.updataFavorites)
+userRoute.get('/user/:id',
+               param('id').isNumeric(),
+               userController.getOneUser)
+userRoute.put('/user/:id',
+               param('id').isNumeric(),
+               body('name').isLength({min:2}),
+               body('surname').isLength({min:2}),
+               userController.updateUser)
+userRoute.patch('/user/homebar/:id',
+                 param('id').isNumeric(), 
+                 body('homebar.coctail').isLength({min:2}),   
+                 userController.updateHomeBar)
+userRoute.patch('/user/favorites/:id',
+                 param('id').isNumeric(), 
+                 body('favorites.coctail').isLength({min:2}),  
+                 userController.updataFavorites)
 
 export default userRoute
 
