@@ -1,7 +1,7 @@
 import cors from 'cors'
 import express from 'express'
-import userRoute from './routes/user.route'
-import coctailRoute from './routes/coctail.route'
+import userRoute from './src/routes/user.route'
+import coctailRoute from './src/routes/coctail.route'
 
 const PORT = process.env.PORT || 4000
 const corsOptions = {
