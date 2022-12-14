@@ -7,7 +7,7 @@ var userRoute = express_1.Router();
 userRoute.post('/user/registration', express_validator_1.body('email').isEmail(), express_validator_1.body('name').isLength({ min: 2, max: 15 }), express_validator_1.body('surname').isLength({ min: 2, max: 15 }), express_validator_1.body('password').isLength({ min: 5 }), user_controller_1["default"].registrate);
 userRoute.patch('/user/auth-code', express_validator_1.body('email').isEmail(), express_validator_1.body('code').isLength({ min: 1, max: 6 }), user_controller_1["default"].sendAuthCode);
 userRoute.post('/user/send-mail', express_validator_1.body('email').isEmail(), user_controller_1["default"].sendMail);
-userRoute.post('/user/login', user_controller_1["default"].login);
+userRoute.post('/user/login', express_validator_1.body('email').isEmail(), express_validator_1.body('password').isLength({ min: 5, max: 25 }), user_controller_1["default"].login);
 userRoute["delete"]('/user/:id', user_controller_1["default"].deleteUser);
 userRoute.get('/user/email/:email', express_validator_1.param('email').isEmail(), user_controller_1["default"].getEmail);
 userRoute.get('/user', user_controller_1["default"].getUsers);

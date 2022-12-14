@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -43,6 +54,8 @@ var mail_service_1 = require("../service/mail-service");
 var bscript = require("bcryptjs");
 var checker_service_1 = require("../service/checker-service");
 var express_validator_1 = require("express-validator");
+var token_service_1 = require("../service/token-service");
+var userDTO_1 = require("../dtos/userDTO");
 dotenv.config();
 var UserController = /** @class */ (function () {
     function UserController() {
@@ -87,24 +100,43 @@ var UserController = /** @class */ (function () {
     };
     UserController.prototype.login = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, email, password, tokenList, user, accessToken, refreshToken, response;
+            var _a, email, password, error, user, sendUser, comparePasswords, userDTO, token;
             return __generator(this, function (_b) {
-                _a = req.body, email = _a.email, password = _a.password;
-                tokenList = {};
-                user = {
-                    email: email,
-                    password: password
-                };
-                accessToken = jwt.sign(user, process.env.ACCESS_TOKEN, { expiresIn: process.env.ACCESS_TOKEN_LIFE });
-                refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN, { expiresIn: process.env.REFRESH_TOKEN_LIFE });
-                response = {
-                    "status": "Logged in",
-                    "accessToken": accessToken,
-                    "refreshToken": refreshToken
-                };
-                tokenList[refreshToken] = response; // send refreshToken to client
-                res.status(200).json(response);
-                return [2 /*return*/];
+                switch (_b.label) {
+                    case 0:
+                        _a = req.body, email = _a.email, password = _a.password;
+                        error = express_validator_1.validationResult(req);
+                        if (error.errors.length) {
+                            return [2 /*return*/, res.status(400).json(error.errors[0].msg)];
+                        }
+                        return [4 /*yield*/, db_1["default"].query("SELECT * FROM person WHERE email = $1", [email])];
+                    case 1: return [4 /*yield*/, (_b.sent()).rows[0]];
+                    case 2:
+                        user = _b.sent();
+                        sendUser = {
+                            name: user.name
+                        };
+                        return [4 /*yield*/, bscript.compare(password, user.rows[0].password)];
+                    case 3:
+                        comparePasswords = _b.sent();
+                        userDTO = new userDTO_1["default"]({
+                            id: user.id,
+                            email: user.email,
+                            isActivated: user.isactivated
+                        });
+                        if (!comparePasswords || !user) {
+                            return [2 /*return*/, res.status(401).json('Authorization error')];
+                        }
+                        if (!(user.rows[0].isactivated)) {
+                            return [2 /*return*/, res.status(401).json('Activation email')];
+                        }
+                        return [4 /*yield*/, token_service_1["default"].generateTokens(__assign({}, userDTO))];
+                    case 4:
+                        token = _b.sent();
+                        res.cookie('refreshToken', token.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
+                        res.status(200).json({ token: token });
+                        return [2 /*return*/];
+                }
             });
         });
     };

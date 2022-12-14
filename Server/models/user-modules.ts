@@ -10,3 +10,9 @@ type ErrorParam = {
 export type ErrorVal = {
     errors: ErrorParam[]
 }
+
+export type TypeUserDTO = {
+    id: string,
+    email: string,
+    isActivated: boolean
+}

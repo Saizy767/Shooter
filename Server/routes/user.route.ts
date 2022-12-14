@@ -19,8 +19,11 @@ userRoute.patch('/user/auth-code',
 userRoute.post('/user/send-mail',
                 body('email').isEmail(),
                 userController.sendMail)
-                
-userRoute.post('/user/login', userController.login)
+
+userRoute.post('/user/login',
+                body('email').isEmail(),
+                body('password').isLength({min:5,max:25}),
+                userController.login)
 userRoute.delete('/user/:id',
                  userController.deleteUser)
 userRoute.get('/user/email/:email',

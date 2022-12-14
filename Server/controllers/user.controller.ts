@@ -7,6 +7,8 @@ import * as bscript from 'bcryptjs'
 import checkService from '../service/checker-service';
 import {validationResult} from 'express-validator'
 import { ErrorVal } from '../models/user-modules';
+import tokenService from '../service/token-service';
+import UserDTO from '../dtos/userDTO';
 
 dotenv.config()
 
@@ -46,23 +48,32 @@ class UserController{
         }
     }
     async login(req:Request, res: Response){
-        const {email , password} = req.body
-        const tokenList:any = {}
-        const user = {
-            email,
-            password
+        const {email , password}:{email:string, password:string} = req.body
+        const error = validationResult(req) as unknown as ErrorVal
+        if(error.errors.length){
+            return res.status(400).json(error.errors[0].msg)
         }
-        const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN,
-                                { expiresIn: process.env.ACCESS_TOKEN_LIFE })
-        const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN,
-                                {expiresIn: process.env.REFRESH_TOKEN_LIFE})
-        const response = {
-            "status": "Logged in",
-            "accessToken": accessToken,
-            "refreshToken": refreshToken
-        }                                  
-        tokenList[refreshToken] = response // send refreshToken to client
-        res.status(200).json(response)
+        const user = await ( await bd.query(`SELECT * FROM person WHERE email = $1`,[email])).rows[0]
+        const sendUser = {
+            name: user.name
+        }
+        const comparePasswords = await bscript.compare(password, user.rows[0].password)
+        const userDTO = new UserDTO({
+            id: user.id,
+            email: user.email,
+            isActivated: user.isactivated
+        })
+        if(!comparePasswords || !user ){
+            return res.status(401).json('Authorization error')
+        }
+        if(!(user.rows[0].isactivated)){
+            return res.status(401).json('Activation email')
+        }
+        const token = await tokenService.generateTokens({...userDTO})
+
+        res.cookie('refreshToken', token.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true})
+        res.status(200).json({token})
+                                    
     }
     async getToken(req: Request, res: Response){
         const postData:{refreshToken:string, email:string, name: string} = req.body

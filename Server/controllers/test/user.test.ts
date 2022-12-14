@@ -512,3 +512,56 @@ describe('adding to user favorites', () => {
     expect(response.body).toBe('Invalid value')
   })
 })
+
+describe('login user', () => {
+  let user:{name:string, surname: string, email: string, password:string}
+  let res: request.Response
+  const testPool = new Pool({
+    user: process.env.POOL_NAME,
+    host: process.env.HOST,
+    port: Number(process.env.DATAPORT),
+    database: process.env.TEST_DATANAME
+  })
+  beforeEach( async ()=>{
+    await testPool.query(`CREATE TABLE person (
+      id SERIAL PRIMARY KEY,
+      email VARCHAR (75) UNIQUE,
+      password VARCHAR(255),
+      name VARCHAR(255),
+      surname VARCHAR(255),
+      favorites JSON ARRAY,
+      homebar JSON ARRAY,
+      isActivated boolean,
+      tokenActivated boolean,
+      activatedCode VARCHAR(6));`)
+    user = {name:'Mike', surname:'Dark' , email: 'qwerty@gmail.com', password: 'qwertyqwert'};
+    res = await request(app).post('/api/user/registration').send(user)
+  })
+  afterEach( async () => {
+    jest.clearAllMocks();
+    await testPool.query('DROP TABLE person;')
+  });
+  it('should return access and refresh tokens', async () => {
+    await request(app)
+          .get('/api/user/1')
+          .then(async (getUser) => await request(app)
+                                  .patch('/api/user/auth-code')
+                                  .send({email:getUser.body[0].email,
+                                         code: getUser.body[0].activatedcode}))
+    const response = await request(app).post('/api/user/login').send({email: user.email, password:user.password})
+    expect(response.body.token.accessToken).toBeTruthy()
+    expect(response.body.token.refreshToken).toBeTruthy()
+  })
+  it('should return error by not activated email', async () => {
+    const response = await request(app).post('/api/user/login').send({email: user.email, password:user.password})
+    expect(response.body).toBe('Activation email')
+  })
+  it('should return error by invalid email', async () => {
+    const response = await request(app).post('/api/user/login').send({email: 'asd', password:user.password})
+    expect(response.body).toBe('Invalid value')
+  })
+  it('should return error by invalid password', async () => {
+    const response = await request(app).post('/api/user/login').send({email: user.email, password:'1234'})
+    expect(response.body).toBe('Invalid value')
+  })
+})
