@@ -1,15 +1,4 @@
 "use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -49,98 +38,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var jwt = require("jsonwebtoken");
 var dotenv = require("dotenv");
-var bscript = require("bcryptjs");
 var express_validator_1 = require("express-validator");
-var mail_service_1 = require("../service/mail-service");
 var checker_service_1 = require("../service/checker-service");
-var token_service_1 = require("../service/token-service");
-var userDTO_1 = require("../dtos/userDTO");
 var db_1 = require("../database/db");
 dotenv.config();
 var UserController = /** @class */ (function () {
     function UserController() {
     }
-    UserController.prototype.registrate = function (req, res) {
-        return __awaiter(this, void 0, void 0, function () {
-            var error, _a, name, surname, email, password, securePassword, activationCode, checkerEmail;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        error = express_validator_1.validationResult(req);
-                        if (error.errors.length) {
-                            return [2 /*return*/, res.status(400).json(error.errors[0].msg)];
-                        }
-                        _a = req.body, name = _a.name, surname = _a.surname, email = _a.email, password = _a.password;
-                        securePassword = bscript.hashSync(password, 6);
-                        activationCode = Math.floor(Math.random() * 999999).toString();
-                        return [4 /*yield*/, checker_service_1["default"].checkEmail(email)];
-                    case 1:
-                        checkerEmail = _b.sent();
-                        if (!checkerEmail) return [3 /*break*/, 3];
-                        return [4 /*yield*/, db_1["default"].query("INSERT INTO person (name, surname, email,\n                                    password, favorites, homebar, \n                                    isActivated,tokenActivated, activatedCode)\n                VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)", [name, surname, email, securePassword, [], [], false, false, activationCode])];
-                    case 2:
-                        _b.sent();
-                        res.status(201).json({ message: 'Account created' });
-                        return [3 /*break*/, 5];
-                    case 3: return [4 /*yield*/, db_1["default"].query("UPDATE person SET name=$1, surname=$2,\n                                    password=$3, favorites=$4, homebar=$5, \n                                    isActivated=$6,tokenActivated=$7, activatedCode=$8 WHERE email= $9", [name, surname, securePassword, [], [], false, false, activationCode, email])];
-                    case 4:
-                        _b.sent();
-                        res.status(200).json({ message: 'Account updated' });
-                        _b.label = 5;
-                    case 5:
-                        if (!(process.env.NODE_ENV !== 'test')) return [3 /*break*/, 7];
-                        return [4 /*yield*/, mail_service_1["default"].sendToEmail(email, activationCode)];
-                    case 6:
-                        _b.sent();
-                        _b.label = 7;
-                    case 7: return [2 /*return*/];
-                }
-            });
-        });
-    };
-    UserController.prototype.login = function (req, res) {
-        return __awaiter(this, void 0, void 0, function () {
-            var error, _a, email, password, user, sendUser, comparePasswords, userDTO, token;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        error = express_validator_1.validationResult(req);
-                        if (error.errors.length) {
-                            return [2 /*return*/, res.status(400).json(error.errors[0].msg)];
-                        }
-                        _a = req.body, email = _a.email, password = _a.password;
-                        return [4 /*yield*/, db_1["default"].query("SELECT * FROM person WHERE email = $1", [email])];
-                    case 1: return [4 /*yield*/, (_b.sent()).rows[0]];
-                    case 2:
-                        user = _b.sent();
-                        sendUser = {
-                            name: user.name,
-                            img: user.img
-                        };
-                        return [4 /*yield*/, bscript.compare(password, user.password)];
-                    case 3:
-                        comparePasswords = _b.sent();
-                        userDTO = new userDTO_1["default"]({
-                            id: user.id,
-                            email: user.email,
-                            isActivated: user.isactivated
-                        });
-                        if (!comparePasswords || !user) {
-                            return [2 /*return*/, res.status(401).json('Authorization error')];
-                        }
-                        if (!(user.isactivated)) {
-                            return [2 /*return*/, res.status(401).json('Activation email')];
-                        }
-                        return [4 /*yield*/, token_service_1["default"].generateTokens(__assign({}, userDTO))];
-                    case 4:
-                        token = _b.sent();
-                        res.cookie('refreshToken', token.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
-                        res.status(200).json({ token: token, sendUser: sendUser });
-                        return [2 /*return*/];
-                }
-            });
-        });
-    };
     UserController.prototype.getToken = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
             var postData, tokenList, user, accessToken, response;
@@ -163,86 +67,6 @@ var UserController = /** @class */ (function () {
                     res.status(404).send('Invalid request');
                 }
                 return [2 /*return*/];
-            });
-        });
-    };
-    UserController.prototype.sendMail = function (req, res) {
-        return __awaiter(this, void 0, void 0, function () {
-            var error, email, activationCode;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        error = express_validator_1.validationResult(req);
-                        if (error.errors.length) {
-                            return [2 /*return*/, res.status(400).json(error.errors[0].msg)];
-                        }
-                        email = req.body.email;
-                        activationCode = Math.floor(Math.random() * 999999).toString();
-                        return [4 /*yield*/, db_1["default"].query("UPDATE person SET activatedCode=$1 WHERE email=$2", [activationCode, email])];
-                    case 1:
-                        _a.sent();
-                        if (!(process.env.NODE_ENV !== 'test')) return [3 /*break*/, 3];
-                        return [4 /*yield*/, mail_service_1["default"].sendToEmail(email, activationCode)];
-                    case 2:
-                        _a.sent();
-                        _a.label = 3;
-                    case 3:
-                        res.status(200).json("Send to " + email);
-                        return [2 /*return*/];
-                }
-            });
-        });
-    };
-    UserController.prototype.sendAuthCode = function (req, res) {
-        return __awaiter(this, void 0, void 0, function () {
-            var error, _a, code, email, CompareCode;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        error = express_validator_1.validationResult(req);
-                        if (error.errors.length) {
-                            return [2 /*return*/, res.status(400).json(error.errors[0].msg)];
-                        }
-                        _a = req.body, code = _a.code, email = _a.email;
-                        return [4 /*yield*/, checker_service_1["default"].checkCode({ email: email, code: code })];
-                    case 1:
-                        CompareCode = _b.sent();
-                        if (!CompareCode) return [3 /*break*/, 3];
-                        return [4 /*yield*/, db_1["default"].query("UPDATE person SET isActivated = $1, tokenActivated = $2 WHERE email = $3", [true, true, email])];
-                    case 2:
-                        _b.sent();
-                        res.status(200).json('Authorization code updated');
-                        return [3 /*break*/, 4];
-                    case 3:
-                        res.status(400).json('Authorization code error');
-                        _b.label = 4;
-                    case 4: return [2 /*return*/];
-                }
-            });
-        });
-    };
-    UserController.prototype.getEmail = function (req, res) {
-        return __awaiter(this, void 0, void 0, function () {
-            var error, email, checkEmail;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        error = express_validator_1.validationResult(req);
-                        if (error.errors.length) {
-                            return [2 /*return*/, res.status(400).json(error.errors[0].msg)];
-                        }
-                        email = req.params.email;
-                        return [4 /*yield*/, checker_service_1["default"].checkEmail(email)];
-                    case 1:
-                        checkEmail = _a.sent();
-                        if (!checkEmail) {
-                            res.status(400).json(email + " is existing");
-                        }
-                        else {
-                            res.status(200).json(email + " is not existing");
-                        }
-                        return [2 /*return*/];
-                }
             });
         });
     };

@@ -1,0 +1,5 @@
+export const authRegistration = '/auth/registration'
+export const authLogin = '/auth/login'
+export const authCode = '/auth/auth-code'
+export const authSendToMail = '/auth/send-mail'
+export const authGetMail = '/auth/email/'

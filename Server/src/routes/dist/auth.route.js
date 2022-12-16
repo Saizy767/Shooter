@@ -1,0 +1,13 @@
+"use strict";
+exports.__esModule = true;
+var express_1 = require("express");
+var express_validator_1 = require("express-validator");
+var auth_controller_1 = require("../controllers/auth.controller");
+var auth_href_1 = require("../href/auth.href");
+var authRoute = express_1.Router();
+authRoute.post(auth_href_1.authRegistration, express_validator_1.body('email').isEmail(), express_validator_1.body('name').isLength({ min: 2, max: 15 }), express_validator_1.body('surname').isLength({ min: 2, max: 15 }), express_validator_1.body('password').isLength({ min: 5 }), auth_controller_1["default"].registrate);
+authRoute.post(auth_href_1.authLogin, express_validator_1.body('email').isEmail(), express_validator_1.body('password').isLength({ min: 5, max: 25 }), auth_controller_1["default"].login);
+authRoute.patch(auth_href_1.authCode, express_validator_1.body('email').isEmail(), express_validator_1.body('code').isLength({ min: 1, max: 6 }), auth_controller_1["default"].sendAuthCode);
+authRoute.post(auth_href_1.authSendToMail, express_validator_1.body('email').isEmail(), auth_controller_1["default"].sendMail);
+authRoute.get(auth_href_1.authGetMail + ':email', express_validator_1.param('email').isEmail(), auth_controller_1["default"].getEmail);
+exports["default"] = authRoute;

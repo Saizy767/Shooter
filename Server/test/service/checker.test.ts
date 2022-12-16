@@ -1,10 +1,12 @@
+import { userURL } from './../../src/href/user.href';
+import { authRegistration } from './../../src/href/auth.href';
 import request from 'supertest';
 import { Pool } from 'pg';
 
-import checkService from '../checker-service'
+import checkService from '../../src/service/checker-service'
 import { app } from "../../index";
-import { DataQuery } from '../../models/user-schema';
-
+import { DataQuery } from '../../src/models/user-schema';
+    
 const testPool = new Pool({
     user: process.env.POOL_NAME,
     host: process.env.HOST,
@@ -14,12 +16,10 @@ const testPool = new Pool({
 
 describe('checker service', ()=>{
     let user:{name:string, surname: string, email: string, password:string}
-    let res: request.Response
-
     beforeEach(async () => {
         await testPool.query(DataQuery)
         user = {name:'Mike', surname:'Dark' , email: 'qwerty@gmail.com', password: 'qwertyqwert'};
-        res = await request(app).post('/api/user/registration').send(user)
+        await request(app).post('/api/'+ authRegistration).send(user)
       });
     afterEach(async () => {
         jest.clearAllMocks();
@@ -38,7 +38,7 @@ describe('checker service', ()=>{
         expect(emailCheck).toBeFalsy()
     }),
     it('checker-code should return true', async () =>{
-        const getUser = await request(app).get('/api/user/1')
+        const getUser = await request(app).get('/api/' + userURL + '1')
         const emailCheck = await checkService.checkCode({email:user.email, code:getUser.body[0].activatedcode})
         expect(emailCheck).toBeTruthy()
     }),

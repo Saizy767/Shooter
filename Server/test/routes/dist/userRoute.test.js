@@ -36,11 +36,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
+var user_href_1 = require("./../../src/href/user.href");
+var auth_href_1 = require("./../../src/href/auth.href");
 var supertest_1 = require("supertest");
 var dotenv = require("dotenv");
 var pg_1 = require("pg");
-var index_1 = require("../../../index");
-var user_schema_1 = require("../../../src/models/user-schema");
+var index_1 = require("../../index");
+var user_schema_1 = require("../../src/models/user-schema");
 dotenv.config();
 var testPool = new pg_1.Pool({
     user: process.env.POOL_NAME,
@@ -58,7 +60,7 @@ describe('user routes', function () {
                 case 1:
                     _a.sent();
                     user = { name: 'Mike', surname: 'Dark', email: 'qwerty@gmail.com', password: 'qwertyqwert' };
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api/user/registration').send(user)];
+                    return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api/' + auth_href_1.authRegistration).send(user)];
                 case 2:
                     req = _a.sent();
                     return [2 /*return*/];
@@ -87,7 +89,7 @@ describe('user routes', function () {
             var response;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api/user/registration').send(user)];
+                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api/' + auth_href_1.authRegistration).send(user)];
                     case 1:
                         response = _a.sent();
                         expect(response.status).toBe(200);
@@ -99,11 +101,11 @@ describe('user routes', function () {
             var person, usercode, response;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).get('/api/user')];
+                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).get('/api' + user_href_1.userURL)];
                     case 1:
                         person = _a.sent();
                         usercode = { email: 'qwerty@gmail.com', code: person.body[0].activatedcode };
-                        return [4 /*yield*/, supertest_1["default"](index_1.app).patch('/api/user/auth-code').send(usercode)];
+                        return [4 /*yield*/, supertest_1["default"](index_1.app).patch('/api/' + auth_href_1.authCode).send(usercode)];
                     case 2:
                         response = _a.sent();
                         expect(response.status).toBe(200);
@@ -115,7 +117,7 @@ describe('user routes', function () {
             var response;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).get('/api/user')];
+                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).get('/api/' + user_href_1.userURL)];
                     case 1:
                         response = _a.sent();
                         expect(response.status).toBe(200);
@@ -127,10 +129,10 @@ describe('user routes', function () {
             var deleteUser, deleteErrorUser;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app)["delete"]('/api/user/1')];
+                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app)["delete"]('/api' + user_href_1.userURL + '1')];
                     case 1:
                         deleteUser = _a.sent();
-                        return [4 /*yield*/, supertest_1["default"](index_1.app)["delete"]('/api/user/2')];
+                        return [4 /*yield*/, supertest_1["default"](index_1.app)["delete"]('/api' + user_href_1.userURL + '2')];
                     case 2:
                         deleteErrorUser = _a.sent();
                         expect(deleteUser.status).toBe(200);
@@ -143,10 +145,10 @@ describe('user routes', function () {
             var existingResponse, response;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).get("/api/user/email/" + user.email)];
+                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).get("/api" + auth_href_1.authGetMail + user.email)];
                     case 1:
                         existingResponse = _a.sent();
-                        return [4 /*yield*/, supertest_1["default"](index_1.app).get("/api/user/email/" + (user.email + 'a'))];
+                        return [4 /*yield*/, supertest_1["default"](index_1.app).get("/api" + auth_href_1.authGetMail + (user.email + 'a'))];
                     case 2:
                         response = _a.sent();
                         expect(existingResponse.status).toBe(400);
@@ -159,10 +161,10 @@ describe('user routes', function () {
             var response, responseError;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).get('/api/user/1')];
+                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).get('/api' + user_href_1.userURL + '1')];
                     case 1:
                         response = _a.sent();
-                        return [4 /*yield*/, supertest_1["default"](index_1.app).get('/api/user/2')];
+                        return [4 /*yield*/, supertest_1["default"](index_1.app).get('/api' + user_href_1.userURL + '2')];
                     case 2:
                         responseError = _a.sent();
                         expect(response.status).toBe(200);
@@ -177,7 +179,7 @@ describe('user routes', function () {
                 switch (_a.label) {
                     case 0:
                         newUser = { name: 'Lucka', surname: 'Host' };
-                        return [4 /*yield*/, supertest_1["default"](index_1.app).put('/api/user/1').send(newUser)];
+                        return [4 /*yield*/, supertest_1["default"](index_1.app).put('/api' + user_href_1.userURL + '1').send(newUser)];
                     case 1:
                         update = _a.sent();
                         expect(update.status).toBe(200);
@@ -189,7 +191,7 @@ describe('user routes', function () {
             var response;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).patch('/api/user/homebar/1').send({ homebar: { coctail: 'Pinokolada' } })];
+                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).patch('/api' + user_href_1.patchHomebar + '1').send({ homebar: { coctail: 'Pinokolada' } })];
                     case 1:
                         response = _a.sent();
                         expect(response.status).toBe(200);
@@ -201,7 +203,7 @@ describe('user routes', function () {
         var response;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).patch('/api/user/favorites/1').send({ favorites: { coctail: 'Pinokolada' } })];
+                case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).patch('/api' + user_href_1.patchFavorites + '1').send({ favorites: { coctail: 'Pinokolada' } })];
                 case 1:
                     response = _a.sent();
                     expect(response.status).toBe(200);

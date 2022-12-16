@@ -1,5 +1,5 @@
 import { TypeUserDTO } from "../../src/models/user-modules"
-import tokenService from "../token-service"
+import tokenService from "../../src/service/token-service"
 
 describe('token service', () => {
     it('should return access and refresh token', async () => {

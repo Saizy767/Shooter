@@ -36,319 +36,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
+var user_href_1 = require("./../../src/href/user.href");
+var auth_href_1 = require("./../../src/href/auth.href");
 var pg_1 = require("pg");
 var supertest_1 = require("supertest");
-var index_1 = require("../../../index");
-var user_schema_1 = require("../../../src/models/user-schema");
+var index_1 = require("../../index");
+var user_schema_1 = require("../../src/models/user-schema");
 var testPool = new pg_1.Pool({
     user: process.env.POOL_NAME,
     host: process.env.HOST,
     port: Number(process.env.DATAPORT),
     database: process.env.TEST_DATANAME
-});
-describe('registration', function () {
-    beforeEach(function () { return __awaiter(void 0, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, testPool.query(user_schema_1.DataQuery)];
-                case 1:
-                    _a.sent();
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    afterEach(function () { return __awaiter(void 0, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    jest.clearAllMocks();
-                    return [4 /*yield*/, testPool.query('DROP TABLE person;')];
-                case 1:
-                    _a.sent();
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it('should response Account created', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var user, newUser, response, repeat, responseGet;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    user = { name: 'Mike', surname: 'Dark', email: 'qwerty@gmail.com', password: 'qwerty' };
-                    newUser = { name: 'Mikes', surname: 'Ligth', email: 'qwerty@gmail.com', password: 'qwerty123' };
-                    return [4 /*yield*/, supertest_1["default"](index_1.app)
-                            .post("/api/user/registration")
-                            .send(user)
-                            .then(function (data) { return data.body; })];
-                case 1:
-                    response = _a.sent();
-                    return [4 /*yield*/, supertest_1["default"](index_1.app)
-                            .post("/api/user/registration")
-                            .send(newUser)
-                            .then(function (data) { return data.body; })];
-                case 2:
-                    repeat = _a.sent();
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).get('/api/user')];
-                case 3:
-                    responseGet = _a.sent();
-                    expect(responseGet.body[0]).toMatchObject({
-                        "email": newUser.email,
-                        "name": newUser.name,
-                        "tokenactivated": false,
-                        "surname": newUser.surname,
-                        "isactivated": false
-                    });
-                    expect(response.message).toBe('Account created');
-                    expect(repeat.message).toBe('Account updated');
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it('should response name empty', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var user, response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    user = { name: '', surname: 'Dark', email: 'qwerty@gmail.com', password: 'qwerty' };
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).post("/api/user/registration").send(user)];
-                case 1:
-                    response = _a.sent();
-                    expect(response.body).toBe('Invalid value');
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it('should response surname empty', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var user, response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    user = { name: 'Mike', surname: '', email: 'qwerty@gmail.com', password: 'qwerty' };
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).post("/api/user/registration").send(user)];
-                case 1:
-                    response = _a.sent();
-                    expect(response.body).toBe('Invalid value');
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it('should response email empty', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var user, response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    user = { name: 'Mike', surname: 'Dark', email: '', password: 'qwerty' };
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).post("/api/user/registration").send(user)];
-                case 1:
-                    response = _a.sent();
-                    expect(response.body).toBe('Invalid value');
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it('should response password empty', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var user, response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    user = { name: 'Mike', surname: 'Dark', email: 'qwerty@gmail.com', password: '' };
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).post("/api/user/registration").send(user)];
-                case 1:
-                    response = _a.sent();
-                    expect(response.body).toBe('Invalid value');
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-});
-describe('send Authorization Code', function () {
-    var user;
-    beforeEach(function () { return __awaiter(void 0, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, testPool.query(user_schema_1.DataQuery)];
-                case 1:
-                    _a.sent();
-                    user = { name: 'Mike', surname: 'Dark', email: 'qwerty@gmail.com', password: 'qwertyqwert' };
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api/user/registration').send(user)];
-                case 2:
-                    _a.sent();
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    afterEach(function () { return __awaiter(void 0, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    jest.clearAllMocks();
-                    return [4 /*yield*/, testPool.query('DROP TABLE person;')];
-                case 1:
-                    _a.sent();
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it('should return Authorization code updated', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var getUser, response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).get('/api/user/1')];
-                case 1:
-                    getUser = _a.sent();
-                    return [4 /*yield*/, supertest_1["default"](index_1.app)
-                            .patch('/api/user/auth-code')
-                            .send({ email: user.email, code: getUser.body[0].activatedcode })];
-                case 2:
-                    response = _a.sent();
-                    expect(response.body).toBe('Authorization code updated');
-                    return [2 /*return*/];
-            }
-        });
-    }); }),
-        it('should return two true of isActivated and tokenActivated', function () { return __awaiter(void 0, void 0, void 0, function () {
-            var getUser, response;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).get('/api/user/1')];
-                    case 1:
-                        getUser = _a.sent();
-                        return [4 /*yield*/, supertest_1["default"](index_1.app)
-                                .patch('/api/user/auth-code')
-                                .send({ email: user.email, code: getUser.body[0].activatedcode })
-                                .then(function () { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
-                                switch (_a.label) {
-                                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).get('/api/user/1')];
-                                    case 1: return [2 /*return*/, _a.sent()];
-                                }
-                            }); }); })
-                                .then(function (data) { return data.body[0]; })];
-                    case 2:
-                        response = _a.sent();
-                        expect(response.isactivated).toBeTruthy();
-                        expect(response.tokenactivated).toBeTruthy();
-                        return [2 /*return*/];
-                }
-            });
-        }); }),
-        it('should return Authorization code error of invalid code', function () { return __awaiter(void 0, void 0, void 0, function () {
-            var response;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app)
-                            .patch('/api/user/auth-code')
-                            .send({ email: user.email, code: '123456' })];
-                    case 1:
-                        response = _a.sent();
-                        expect(response.body).toBe('Authorization code error');
-                        return [2 /*return*/];
-                }
-            });
-        }); }),
-        it('should return two false of isActivated and tokenActivated', function () { return __awaiter(void 0, void 0, void 0, function () {
-            var response;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app)
-                            .patch('/api/user/auth-code')
-                            .send({ email: user.email, code: '123456' })
-                            .then(function () { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
-                            switch (_a.label) {
-                                case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).get('/api/user/1')];
-                                case 1: return [2 /*return*/, _a.sent()];
-                            }
-                        }); }); })
-                            .then(function (data) { return data.body[0]; })];
-                    case 1:
-                        response = _a.sent();
-                        expect(response.isactivated).toBeFalsy();
-                        expect(response.tokenactivated).toBeFalsy();
-                        return [2 /*return*/];
-                }
-            });
-        }); }),
-        it('should return Authorization code error of empty email', function () { return __awaiter(void 0, void 0, void 0, function () {
-            var response;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app)
-                            .patch('/api/user/auth-code')
-                            .send({ email: '', code: '123456' })];
-                    case 1:
-                        response = _a.sent();
-                        expect(response.body).toBe('Invalid value');
-                        return [2 /*return*/];
-                }
-            });
-        }); }),
-        it('should return Authorization code error of empty code', function () { return __awaiter(void 0, void 0, void 0, function () {
-            var response;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app)
-                            .patch('/api/user/auth-code')
-                            .send({ email: user.email, code: '' })];
-                    case 1:
-                        response = _a.sent();
-                        expect(response.body).toBe('Invalid value');
-                        return [2 /*return*/];
-                }
-            });
-        }); });
-});
-describe('send to email', function () {
-    var user;
-    var res;
-    beforeEach(function () { return __awaiter(void 0, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, testPool.query(user_schema_1.DataQuery)];
-                case 1:
-                    _a.sent();
-                    user = { name: 'Mike', surname: 'Dark', email: 'qwerty@gmail.com', password: 'qwertyqwert' };
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api/user/registration').send(user)];
-                case 2:
-                    res = _a.sent();
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    afterEach(function () { return __awaiter(void 0, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    jest.clearAllMocks();
-                    return [4 /*yield*/, testPool.query('DROP TABLE person;')];
-                case 1:
-                    _a.sent();
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it('should send code to email', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api/user/send-mail').send({ email: user.email })];
-                case 1:
-                    response = _a.sent();
-                    expect(response.body).toBe("Send to " + user.email);
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it('should return error of invalid email', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api/user/send-mail').send({ email: '12' })];
-                case 1:
-                    response = _a.sent();
-                    expect(response.body).toBe("Invalid value");
-                    return [2 /*return*/];
-            }
-        });
-    }); });
 });
 describe('delete user', function () {
     var user;
@@ -359,7 +57,7 @@ describe('delete user', function () {
                 case 1:
                     _a.sent();
                     user = { name: 'Mike', surname: 'Dark', email: 'qwerty@gmail.com', password: 'qwertyqwert' };
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api/user/registration').send(user)];
+                    return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api' + auth_href_1.authRegistration).send(user)];
                 case 2:
                     _a.sent();
                     return [2 /*return*/];
@@ -384,7 +82,7 @@ describe('delete user', function () {
             switch (_a.label) {
                 case 0:
                     id = 1;
-                    return [4 /*yield*/, supertest_1["default"](index_1.app)["delete"]("/api/user/" + id).send({ id: id })];
+                    return [4 /*yield*/, supertest_1["default"](index_1.app)["delete"]("/api" + user_href_1.userURL + id).send({ id: id })];
                 case 1:
                     response = _a.sent();
                     expect(response.body).toBe("User " + id + " deleted");
@@ -398,10 +96,10 @@ describe('delete user', function () {
             switch (_a.label) {
                 case 0:
                     id = 2;
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).get("/api/user/" + id)];
+                    return [4 /*yield*/, supertest_1["default"](index_1.app).get("/api" + user_href_1.userURL + id)];
                 case 1:
                     getUser = _a.sent();
-                    return [4 /*yield*/, supertest_1["default"](index_1.app)["delete"]("/api/user/" + id).send({ id: id })];
+                    return [4 /*yield*/, supertest_1["default"](index_1.app)["delete"]("/api" + user_href_1.userURL + id).send({ id: id })];
                 case 2:
                     response = _a.sent();
                     expect(response.body).toBe("User " + id + " is not existing");
@@ -409,75 +107,6 @@ describe('delete user', function () {
             }
         });
     }); });
-});
-describe('send email for check of existing', function () {
-    var user;
-    beforeEach(function () { return __awaiter(void 0, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, testPool.query(user_schema_1.DataQuery)];
-                case 1:
-                    _a.sent();
-                    user = { name: 'Mike', surname: 'Dark', email: 'qwerty@gmail.com', password: 'qwertyqwert' };
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api/user/registration').send(user)];
-                case 2:
-                    _a.sent();
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    afterEach(function () { return __awaiter(void 0, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    jest.clearAllMocks();
-                    return [4 /*yield*/, testPool.query('DROP TABLE person;')];
-                case 1:
-                    _a.sent();
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it('should return existing email', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).get("/api/user/email/" + user.email)];
-                case 1:
-                    response = _a.sent();
-                    expect(response.body).toBe(user.email + " is existing");
-                    return [2 /*return*/];
-            }
-        });
-    }); }),
-        it('should return email isnt existing', function () { return __awaiter(void 0, void 0, void 0, function () {
-            var email, response;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        email = 'qwertyu@gmail.com';
-                        return [4 /*yield*/, supertest_1["default"](index_1.app).get("/api/user/email/" + email)];
-                    case 1:
-                        response = _a.sent();
-                        expect(response.body).toBe(email + " is not existing");
-                        return [2 /*return*/];
-                }
-            });
-        }); }),
-        it('should return error of invalid email', function () { return __awaiter(void 0, void 0, void 0, function () {
-            var email, response;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        email = 'qwerqwas@sadas';
-                        return [4 /*yield*/, supertest_1["default"](index_1.app).get("/api/user/email/" + email)];
-                    case 1:
-                        response = _a.sent();
-                        expect(response.body).toBe("Invalid value");
-                        return [2 /*return*/];
-                }
-            });
-        }); });
 });
 describe('get all users', function () {
     var user;
@@ -488,7 +117,7 @@ describe('get all users', function () {
                 case 1:
                     _a.sent();
                     user = { name: 'Mike', surname: 'Dark', email: 'qwerty@gmail.com', password: 'qwertyqwert' };
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api/user/registration').send(user)];
+                    return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api' + auth_href_1.authRegistration).send(user)];
                 case 2:
                     _a.sent();
                     return [2 /*return*/];
@@ -511,7 +140,7 @@ describe('get all users', function () {
         var response;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).get('/api/user')];
+                case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).get('/api' + user_href_1.userURL)];
                 case 1:
                     response = _a.sent();
                     expect(response.body[0]).toMatchObject({
@@ -535,7 +164,7 @@ describe('get one user by ID', function () {
                 case 1:
                     _a.sent();
                     user = { name: 'Mike', surname: 'Dark', email: 'qwerty@gmail.com', password: 'qwertyqwert' };
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api/user/registration').send(user)];
+                    return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api' + auth_href_1.authRegistration).send(user)];
                 case 2:
                     _a.sent();
                     return [2 /*return*/];
@@ -558,7 +187,7 @@ describe('get one user by ID', function () {
         var response;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).get('/api/user/1')];
+                case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).get("/api" + user_href_1.userURL + "1")];
                 case 1:
                     response = _a.sent();
                     expect(response.body[0]).toMatchObject({
@@ -576,7 +205,7 @@ describe('get one user by ID', function () {
             var response;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).get('/api/user/2')];
+                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).get("/api" + user_href_1.userURL + "2")];
                     case 1:
                         response = _a.sent();
                         expect(response.body).toBe('This ID not exsist');
@@ -588,7 +217,7 @@ describe('get one user by ID', function () {
         var response;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).get('/api/user/asd')];
+                case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).get("/api" + user_href_1.userURL + "asd")];
                 case 1:
                     response = _a.sent();
                     expect(response.body).toBe('Invalid value');
@@ -606,7 +235,7 @@ describe('updating user by ID', function () {
                 case 1:
                     _a.sent();
                     user = { name: 'Mike', surname: 'Dark', email: 'qwerty@gmail.com', password: 'qwertyqwert' };
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api/user/registration').send(user)];
+                    return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api' + auth_href_1.authRegistration).send(user)];
                 case 2:
                     _a.sent();
                     return [2 /*return*/];
@@ -626,15 +255,16 @@ describe('updating user by ID', function () {
         });
     }); });
     it('should update user', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var updatedCharecters, response;
+        var updatedCharecters, id, response;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     updatedCharecters = { name: 'Lucka', surname: 'Host' };
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).put('/api/user/1').send(updatedCharecters)];
+                    id = 1;
+                    return [4 /*yield*/, supertest_1["default"](index_1.app).put("/api" + user_href_1.userURL + id).send(updatedCharecters)];
                 case 1:
                     _a.sent();
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).get('/api/user/1')];
+                    return [4 /*yield*/, supertest_1["default"](index_1.app).get("/api" + user_href_1.userURL + "1")];
                 case 2:
                     response = _a.sent();
                     expect(response.body[0]).toMatchObject({
@@ -652,7 +282,7 @@ describe('updating user by ID', function () {
                 switch (_a.label) {
                     case 0:
                         updatedCharecters = { name: 'Lucka', email: 'qwertyu@gmail.com' };
-                        return [4 /*yield*/, supertest_1["default"](index_1.app).put('/api/user/1').send(updatedCharecters)];
+                        return [4 /*yield*/, supertest_1["default"](index_1.app).put("/api" + user_href_1.userURL + "1").send(updatedCharecters)];
                     case 1:
                         response = _a.sent();
                         expect(response.body).toBe('Invalid value');
@@ -666,7 +296,7 @@ describe('updating user by ID', function () {
             switch (_a.label) {
                 case 0:
                     updatedCharecters = { name: '', surname: 'Host' };
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).put('/api/user/1').send(updatedCharecters)];
+                    return [4 /*yield*/, supertest_1["default"](index_1.app).put("/api" + user_href_1.userURL + "1").send(updatedCharecters)];
                 case 1:
                     response = _a.sent();
                     expect(response.body).toBe('Invalid value');
@@ -680,7 +310,7 @@ describe('updating user by ID', function () {
             switch (_a.label) {
                 case 0:
                     updatedCharecters = { name: 'Lucka', surname: ';' };
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).put('/api/user/1').send(updatedCharecters)];
+                    return [4 /*yield*/, supertest_1["default"](index_1.app).put("/api" + user_href_1.userURL + "1").send(updatedCharecters)];
                 case 1:
                     response = _a.sent();
                     expect(response.body).toBe('Invalid value');
@@ -694,7 +324,7 @@ describe('updating user by ID', function () {
             switch (_a.label) {
                 case 0:
                     updatedCharecters = { name: 'Lucka', surname: 'Host' };
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).put('/api/user/qwer').send(updatedCharecters)];
+                    return [4 /*yield*/, supertest_1["default"](index_1.app).put("/api" + user_href_1.userURL + "qwer").send(updatedCharecters)];
                 case 1:
                     response = _a.sent();
                     expect(response.body).toBe('Invalid value');
@@ -708,7 +338,7 @@ describe('updating user by ID', function () {
             switch (_a.label) {
                 case 0:
                     updatedCharecters = { name: 'Lucka', surname: 'Host' };
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).put('/api/user/12').send(updatedCharecters)];
+                    return [4 /*yield*/, supertest_1["default"](index_1.app).put("/api" + user_href_1.userURL + "12").send(updatedCharecters)];
                 case 1:
                     response = _a.sent();
                     expect(response.body).toBe('This ID not exsist');
@@ -726,7 +356,7 @@ describe('adding to user homebar', function () {
                 case 1:
                     _a.sent();
                     user = { name: 'Mike', surname: 'Dark', email: 'qwerty@gmail.com', password: 'qwertyqwert' };
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api/user/registration').send(user)];
+                    return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api' + auth_href_1.authRegistration).send(user)];
                 case 2:
                     _a.sent();
                     return [2 /*return*/];
@@ -746,16 +376,18 @@ describe('adding to user homebar', function () {
         });
     }); });
     it('should adding 2 coctails', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var responseGet;
+        var id, responseGet;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).patch('/api/user/homebar/1').send({ homebar: { coctail: 'Pinokolada' } })];
+                case 0:
+                    id = 1;
+                    return [4 /*yield*/, supertest_1["default"](index_1.app).patch("/api" + user_href_1.patchHomebar + id).send({ homebar: { coctail: 'Pinokolada' } })];
                 case 1:
                     _a.sent();
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).patch('/api/user/homebar/1').send({ homebar: { coctail: 'B52' } })];
+                    return [4 /*yield*/, supertest_1["default"](index_1.app).patch("/api" + user_href_1.patchHomebar + id).send({ homebar: { coctail: 'B52' } })];
                 case 2:
                     _a.sent();
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).get('/api/user/1')];
+                    return [4 /*yield*/, supertest_1["default"](index_1.app).get("/api" + user_href_1.userURL + id)];
                 case 3:
                     responseGet = _a.sent();
                     expect(responseGet.body[0].homebar).toStrictEqual([{ coctail: 'Pinokolada' }, { coctail: 'B52' }]);
@@ -764,16 +396,18 @@ describe('adding to user homebar', function () {
         });
     }); }),
         it('should adding one coctail of 2', function () { return __awaiter(void 0, void 0, void 0, function () {
-            var errorReq, responseGet;
+            var id, errorReq, responseGet;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).patch('/api/user/homebar/1').send({ homebar: { coctail: 'Pinokolada' } })];
+                    case 0:
+                        id = 1;
+                        return [4 /*yield*/, supertest_1["default"](index_1.app).patch("/api" + user_href_1.patchHomebar + id).send({ homebar: { coctail: 'Pinokolada' } })];
                     case 1:
                         _a.sent();
-                        return [4 /*yield*/, supertest_1["default"](index_1.app).patch('/api/user/homebar/1').send({ homebar: { coctail: '' } })];
+                        return [4 /*yield*/, supertest_1["default"](index_1.app).patch("/api" + user_href_1.patchHomebar + id).send({ homebar: { coctail: '' } })];
                     case 2:
                         errorReq = _a.sent();
-                        return [4 /*yield*/, supertest_1["default"](index_1.app).get('/api/user/1')];
+                        return [4 /*yield*/, supertest_1["default"](index_1.app).get("/api" + user_href_1.userURL + id)];
                     case 3:
                         responseGet = _a.sent();
                         expect(responseGet.body[0].homebar).toStrictEqual([{ coctail: 'Pinokolada' }]);
@@ -783,10 +417,12 @@ describe('adding to user homebar', function () {
             });
         }); }),
         it('should send error by invalid ID', function () { return __awaiter(void 0, void 0, void 0, function () {
-            var response;
+            var id, response;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).patch('/api/user/homebar/qwe').send({ homebar: { coctail: 'Pinokolada' } })];
+                    case 0:
+                        id = 'qwe';
+                        return [4 /*yield*/, supertest_1["default"](index_1.app).patch("/api" + user_href_1.patchHomebar + id).send({ homebar: { coctail: 'Pinokolada' } })];
                     case 1:
                         response = _a.sent();
                         expect(response.body).toBe('Invalid value');
@@ -804,7 +440,7 @@ describe('adding to user favorites', function () {
                 case 1:
                     _a.sent();
                     user = { name: 'Mike', surname: 'Dark', email: 'qwerty@gmail.com', password: 'qwertyqwert' };
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api/user/registration').send(user)];
+                    return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api' + auth_href_1.authRegistration).send(user)];
                 case 2:
                     _a.sent();
                     return [2 /*return*/];
@@ -816,7 +452,7 @@ describe('adding to user favorites', function () {
             switch (_a.label) {
                 case 0:
                     jest.clearAllMocks();
-                    return [4 /*yield*/, testPool.query('DROP TABLE person;')];
+                    return [4 /*yield*/, testPool.query('DROP TABLE IF EXISTS person;')];
                 case 1:
                     _a.sent();
                     return [2 /*return*/];
@@ -824,16 +460,18 @@ describe('adding to user favorites', function () {
         });
     }); });
     it('should adding 2 coctails', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var responseGet;
+        var id, responseGet;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).patch('/api/user/favorites/1').send({ favorites: { coctail: 'Pinokolada' } })];
+                case 0:
+                    id = 1;
+                    return [4 /*yield*/, supertest_1["default"](index_1.app).patch("/api" + user_href_1.patchFavorites + id).send({ favorites: { coctail: 'Pinokolada' } })];
                 case 1:
                     _a.sent();
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).patch('/api/user/favorites/1').send({ favorites: { coctail: 'B52' } })];
+                    return [4 /*yield*/, supertest_1["default"](index_1.app).patch("/api" + user_href_1.patchFavorites + id).send({ favorites: { coctail: 'B52' } })];
                 case 2:
                     _a.sent();
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).get('/api/user/1')];
+                    return [4 /*yield*/, supertest_1["default"](index_1.app).get("/api" + user_href_1.userURL + id)];
                 case 3:
                     responseGet = _a.sent();
                     expect(responseGet.body[0].favorites).toStrictEqual([{ coctail: 'Pinokolada' }, { coctail: 'B52' }]);
@@ -842,16 +480,18 @@ describe('adding to user favorites', function () {
         });
     }); }),
         it('should adding one coctail of 2', function () { return __awaiter(void 0, void 0, void 0, function () {
-            var errorReq, responseGet;
+            var id, errorReq, responseGet;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).patch('/api/user/favorites/1').send({ favorites: { coctail: 'Pinokolada' } })];
+                    case 0:
+                        id = 1;
+                        return [4 /*yield*/, supertest_1["default"](index_1.app).patch("/api" + user_href_1.patchFavorites + id).send({ favorites: { coctail: 'Pinokolada' } })];
                     case 1:
                         _a.sent();
-                        return [4 /*yield*/, supertest_1["default"](index_1.app).patch('/api/user/favorites/1').send({ favorites: { coctail: '' } })];
+                        return [4 /*yield*/, supertest_1["default"](index_1.app).patch("/api" + user_href_1.patchFavorites + id).send({ favorites: { coctail: '' } })];
                     case 2:
                         errorReq = _a.sent();
-                        return [4 /*yield*/, supertest_1["default"](index_1.app).get('/api/user/1')];
+                        return [4 /*yield*/, supertest_1["default"](index_1.app).get("/api" + user_href_1.userURL + id)];
                     case 3:
                         responseGet = _a.sent();
                         expect(responseGet.body[0].favorites).toStrictEqual([{ coctail: 'Pinokolada' }]);
@@ -861,10 +501,12 @@ describe('adding to user favorites', function () {
             });
         }); }),
         it('should send error by invalid ID', function () { return __awaiter(void 0, void 0, void 0, function () {
-            var response;
+            var id, response;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).patch('/api/user/favorites/qwe').send({ favorites: { coctail: 'Pinokolada' } })];
+                    case 0:
+                        id = 'qwe';
+                        return [4 /*yield*/, supertest_1["default"](index_1.app).patch("/api" + user_href_1.patchFavorites + id).send({ favorites: { coctail: 'Pinokolada' } })];
                     case 1:
                         response = _a.sent();
                         expect(response.body).toBe('Invalid value');
@@ -872,97 +514,4 @@ describe('adding to user favorites', function () {
                 }
             });
         }); });
-});
-describe('login user', function () {
-    var user;
-    beforeEach(function () { return __awaiter(void 0, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, testPool.query(user_schema_1.DataQuery)];
-                case 1:
-                    _a.sent();
-                    user = { name: 'Mike', surname: 'Dark', email: 'qwerty@gmail.com', password: 'qwertyqwert' };
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api/user/registration').send(user)];
-                case 2:
-                    _a.sent();
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    afterEach(function () { return __awaiter(void 0, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    jest.clearAllMocks();
-                    return [4 /*yield*/, testPool.query('DROP TABLE person;')];
-                case 1:
-                    _a.sent();
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it('should return access and refresh tokens', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, supertest_1["default"](index_1.app)
-                        .get('/api/user/1')
-                        .then(function (getUser) { return __awaiter(void 0, void 0, void 0, function () {
-                        return __generator(this, function (_a) {
-                            switch (_a.label) {
-                                case 0: return [4 /*yield*/, supertest_1["default"](index_1.app)
-                                        .patch('/api/user/auth-code')
-                                        .send({ email: getUser.body[0].email,
-                                        code: getUser.body[0].activatedcode })];
-                                case 1: return [2 /*return*/, _a.sent()];
-                            }
-                        });
-                    }); })];
-                case 1:
-                    _a.sent();
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api/user/login').send({ email: user.email, password: user.password })];
-                case 2:
-                    response = _a.sent();
-                    expect(response.body.token.accessToken).toBeTruthy();
-                    expect(response.body.token.refreshToken).toBeTruthy();
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it('should return error by not activated email', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api/user/login').send({ email: user.email, password: user.password })];
-                case 1:
-                    response = _a.sent();
-                    expect(response.body).toBe('Activation email');
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it('should return error by invalid email', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api/user/login').send({ email: 'asd', password: user.password })];
-                case 1:
-                    response = _a.sent();
-                    expect(response.body).toBe('Invalid value');
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-    it('should return error by invalid password', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var response;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api/user/login').send({ email: user.email, password: '1234' })];
-                case 1:
-                    response = _a.sent();
-                    expect(response.body).toBe('Invalid value');
-                    return [2 /*return*/];
-            }
-        });
-    }); });
 });

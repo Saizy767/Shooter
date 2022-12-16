@@ -36,11 +36,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
+var user_href_1 = require("./../../src/href/user.href");
+var auth_href_1 = require("./../../src/href/auth.href");
 var supertest_1 = require("supertest");
 var pg_1 = require("pg");
-var checker_service_1 = require("../checker-service");
+var checker_service_1 = require("../../src/service/checker-service");
 var index_1 = require("../../index");
-var user_schema_1 = require("../../models/user-schema");
+var user_schema_1 = require("../../src/models/user-schema");
 var testPool = new pg_1.Pool({
     user: process.env.POOL_NAME,
     host: process.env.HOST,
@@ -49,7 +51,6 @@ var testPool = new pg_1.Pool({
 });
 describe('checker service', function () {
     var user;
-    var res;
     beforeEach(function () { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -57,9 +58,9 @@ describe('checker service', function () {
                 case 1:
                     _a.sent();
                     user = { name: 'Mike', surname: 'Dark', email: 'qwerty@gmail.com', password: 'qwertyqwert' };
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api/user/registration').send(user)];
+                    return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api/' + auth_href_1.authRegistration).send(user)];
                 case 2:
-                    res = _a.sent();
+                    _a.sent();
                     return [2 /*return*/];
             }
         });
@@ -116,7 +117,7 @@ describe('checker service', function () {
             var getUser, emailCheck;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).get('/api/user/1')];
+                    case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).get('/api/' + user_href_1.userURL + '1')];
                     case 1:
                         getUser = _a.sent();
                         return [4 /*yield*/, checker_service_1["default"].checkCode({ email: user.email, code: getUser.body[0].activatedcode })];

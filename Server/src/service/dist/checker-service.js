@@ -36,25 +36,54 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var jwt = require("jsonwebtoken");
-var dotenv = require("dotenv");
-dotenv.config();
-var TokenService = /** @class */ (function () {
-    function TokenService() {
+var db_1 = require("../database/db");
+var checkService = /** @class */ (function () {
+    function checkService() {
     }
-    TokenService.prototype.generateTokens = function (payload) {
+    checkService.prototype.checkEmail = function (email) {
+        var _a;
         return __awaiter(this, void 0, void 0, function () {
-            var accessToken, refreshToken;
-            return __generator(this, function (_a) {
-                accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN, { expiresIn: process.env.ACCESS_TOKEN_LIFE });
-                refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN, { expiresIn: process.env.REFRESH_TOKEN_LIFE });
-                return [2 /*return*/, {
-                        accessToken: accessToken,
-                        refreshToken: refreshToken
-                    }];
+            var emailDB;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0: return [4 /*yield*/, db_1["default"].query("SELECT email FROM person WHERE email = $1", [email])];
+                    case 1:
+                        emailDB = _b.sent();
+                        return [2 /*return*/, (email !== ((_a = emailDB.rows[0]) === null || _a === void 0 ? void 0 : _a.email)) ? true : false];
+                }
             });
         });
     };
-    return TokenService;
+    checkService.prototype.checkCode = function (_a) {
+        var _b;
+        var code = _a.code, email = _a.email;
+        return __awaiter(this, void 0, void 0, function () {
+            var codeAuth;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0: return [4 /*yield*/, db_1["default"].query("SELECT activatedcode FROM person WHERE email = $1", [email])];
+                    case 1:
+                        codeAuth = _c.sent();
+                        return [2 /*return*/, code === ((_b = codeAuth.rows[0]) === null || _b === void 0 ? void 0 : _b.activatedcode) ? true : false];
+                }
+            });
+        });
+    };
+    checkService.prototype.checkID = function (_a) {
+        var _b;
+        var id = _a.id;
+        return __awaiter(this, void 0, void 0, function () {
+            var codeAuth;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0: return [4 /*yield*/, db_1["default"].query("SELECT id FROM person WHERE id = $1", [id])];
+                    case 1:
+                        codeAuth = _c.sent();
+                        return [2 /*return*/, Number(id) === ((_b = codeAuth.rows[0]) === null || _b === void 0 ? void 0 : _b.id) ? true : false];
+                }
+            });
+        });
+    };
+    return checkService;
 }());
-exports["default"] = new TokenService();
+exports["default"] = new checkService();

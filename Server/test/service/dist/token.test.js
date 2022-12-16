@@ -47,7 +47,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var token_service_1 = require("../token-service");
+var token_service_1 = require("../../src/service/token-service");
 describe('token service', function () {
     it('should return access and refresh token', function () { return __awaiter(void 0, void 0, void 0, function () {
         var userDTO, req;
