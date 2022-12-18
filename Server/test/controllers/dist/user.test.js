@@ -214,13 +214,15 @@ describe('get one user by ID', function () {
             });
         }); });
     it('should return error cause ID is NaN', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var response;
+        var errorID, response;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, supertest_1["default"](index_1.app).get("/api" + user_href_1.userURL + "asd")];
+                case 0:
+                    errorID = 'asd';
+                    return [4 /*yield*/, supertest_1["default"](index_1.app).get("/api" + user_href_1.userURL + errorID)];
                 case 1:
                     response = _a.sent();
-                    expect(response.body).toBe('Invalid value');
+                    expect(response.body).toStrictEqual({ "location": "params", "msg": "Invalid value", "param": "id", "value": errorID });
                     return [2 /*return*/];
             }
         });
@@ -285,7 +287,9 @@ describe('updating user by ID', function () {
                         return [4 /*yield*/, supertest_1["default"](index_1.app).put("/api" + user_href_1.userURL + "1").send(updatedCharecters)];
                     case 1:
                         response = _a.sent();
-                        expect(response.body).toBe('Invalid value');
+                        expect(response.body).toStrictEqual({ "location": "body",
+                            "msg": "Invalid value",
+                            "param": "surname" });
                         return [2 /*return*/];
                 }
             });
@@ -299,7 +303,10 @@ describe('updating user by ID', function () {
                     return [4 /*yield*/, supertest_1["default"](index_1.app).put("/api" + user_href_1.userURL + "1").send(updatedCharecters)];
                 case 1:
                     response = _a.sent();
-                    expect(response.body).toBe('Invalid value');
+                    expect(response.body).toStrictEqual({ "location": "body",
+                        "msg": "Invalid value",
+                        "param": "name",
+                        "value": updatedCharecters.name });
                     return [2 /*return*/];
             }
         });
@@ -309,25 +316,32 @@ describe('updating user by ID', function () {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    updatedCharecters = { name: 'Lucka', surname: ';' };
+                    updatedCharecters = { name: 'Lucka', surname: '' };
                     return [4 /*yield*/, supertest_1["default"](index_1.app).put("/api" + user_href_1.userURL + "1").send(updatedCharecters)];
                 case 1:
                     response = _a.sent();
-                    expect(response.body).toBe('Invalid value');
+                    expect(response.body).toStrictEqual({ "location": "body",
+                        "msg": "Invalid value",
+                        "param": "surname",
+                        "value": updatedCharecters.surname });
                     return [2 /*return*/];
             }
         });
     }); });
     it('should send error by invalid ID', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var updatedCharecters, response;
+        var updatedCharecters, errorID, response;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     updatedCharecters = { name: 'Lucka', surname: 'Host' };
-                    return [4 /*yield*/, supertest_1["default"](index_1.app).put("/api" + user_href_1.userURL + "qwer").send(updatedCharecters)];
+                    errorID = 'qwer';
+                    return [4 /*yield*/, supertest_1["default"](index_1.app).put("/api" + user_href_1.userURL + errorID).send(updatedCharecters)];
                 case 1:
                     response = _a.sent();
-                    expect(response.body).toBe('Invalid value');
+                    expect(response.body).toStrictEqual({ "location": "params",
+                        "msg": "Invalid value",
+                        "param": "id",
+                        "value": errorID });
                     return [2 /*return*/];
             }
         });
@@ -411,21 +425,21 @@ describe('adding to user homebar', function () {
                     case 3:
                         responseGet = _a.sent();
                         expect(responseGet.body[0].homebar).toStrictEqual([{ coctail: 'Pinokolada' }]);
-                        expect(errorReq.body).toBe('Invalid value');
+                        expect(errorReq.body).toStrictEqual({ "location": "body", "msg": "Invalid value", "param": "homebar.coctail", "value": '' });
                         return [2 /*return*/];
                 }
             });
         }); }),
         it('should send error by invalid ID', function () { return __awaiter(void 0, void 0, void 0, function () {
-            var id, response;
+            var errorId, response;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        id = 'qwe';
-                        return [4 /*yield*/, supertest_1["default"](index_1.app).patch("/api" + user_href_1.patchHomebar + id).send({ homebar: { coctail: 'Pinokolada' } })];
+                        errorId = 'qwe';
+                        return [4 /*yield*/, supertest_1["default"](index_1.app).patch("/api" + user_href_1.patchHomebar + errorId).send({ homebar: { coctail: 'Pinokolada' } })];
                     case 1:
                         response = _a.sent();
-                        expect(response.body).toBe('Invalid value');
+                        expect(response.body).toStrictEqual({ "location": "params", "msg": "Invalid value", "param": "id", "value": errorId });
                         return [2 /*return*/];
                 }
             });
@@ -495,21 +509,27 @@ describe('adding to user favorites', function () {
                     case 3:
                         responseGet = _a.sent();
                         expect(responseGet.body[0].favorites).toStrictEqual([{ coctail: 'Pinokolada' }]);
-                        expect(errorReq.body).toBe('Invalid value');
+                        expect(errorReq.body).toStrictEqual({ "location": "body",
+                            "msg": "Invalid value",
+                            "param": "favorites.coctail",
+                            "value": "" });
                         return [2 /*return*/];
                 }
             });
         }); }),
         it('should send error by invalid ID', function () { return __awaiter(void 0, void 0, void 0, function () {
-            var id, response;
+            var errorId, response;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        id = 'qwe';
-                        return [4 /*yield*/, supertest_1["default"](index_1.app).patch("/api" + user_href_1.patchFavorites + id).send({ favorites: { coctail: 'Pinokolada' } })];
+                        errorId = 'qwe';
+                        return [4 /*yield*/, supertest_1["default"](index_1.app).patch("/api" + user_href_1.patchFavorites + errorId).send({ favorites: { coctail: 'Pinokolada' } })];
                     case 1:
                         response = _a.sent();
-                        expect(response.body).toBe('Invalid value');
+                        expect(response.body).toStrictEqual({ "location": "params",
+                            "msg": "Invalid value",
+                            "param": "id",
+                            "value": errorId });
                         return [2 /*return*/];
                 }
             });

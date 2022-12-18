@@ -88,8 +88,9 @@ describe('get one user by ID' , () => {
     expect(response.body).toBe('This ID not exsist')
   })
   it('should return error cause ID is NaN', async () => {
-    const response = await request(app).get(`/api${userURL}asd`)
-    expect(response.body).toBe('Invalid value')
+    const errorID = 'asd'
+    const response = await request(app).get(`/api${userURL}${errorID}`)
+    expect(response.body).toStrictEqual({"location": "params", "msg": "Invalid value", "param": "id", "value": errorID})
   })
 })
 
@@ -118,22 +119,34 @@ describe('updating user by ID', () => {
   it('should send error of extraneous parameter', async () => {
     const updatedCharecters = {name:'Lucka', email:'qwertyu@gmail.com'}
     const response = await request(app).put(`/api${userURL}1`).send(updatedCharecters)
-    expect(response.body).toBe('Invalid value')
+    expect(response.body).toStrictEqual({"location": "body",
+                                         "msg": "Invalid value",
+                                         "param": "surname"})
   })
   it('should send error by empty name', async () => {
     const updatedCharecters = {name:'', surname:'Host'}
     const response = await request(app).put(`/api${userURL}1`).send(updatedCharecters)
-    expect(response.body).toBe('Invalid value')
+    expect(response.body).toStrictEqual({"location": "body",
+                                         "msg": "Invalid value", 
+                                         "param": "name", 
+                                         "value": updatedCharecters.name})
   })
   it('should send error by empty surname', async () => {
-    const updatedCharecters = {name:'Lucka', surname:';'}
+    const updatedCharecters = {name:'Lucka', surname:''}
     const response = await request(app).put(`/api${userURL}1`).send(updatedCharecters)
-    expect(response.body).toBe('Invalid value')
+    expect(response.body).toStrictEqual({"location": "body",
+                                         "msg": "Invalid value", 
+                                         "param": "surname", 
+                                         "value": updatedCharecters.surname})
   })
   it('should send error by invalid ID', async () => {
     const updatedCharecters = {name:'Lucka', surname:'Host'}
-    const response = await request(app).put(`/api${userURL}qwer`).send(updatedCharecters)
-    expect(response.body).toBe('Invalid value')
+    const errorID = 'qwer'
+    const response = await request(app).put(`/api${userURL}${errorID}`).send(updatedCharecters)
+    expect(response.body).toStrictEqual({"location": "params",
+                                         "msg": "Invalid value", 
+                                         "param": "id", 
+                                         "value": errorID})
   })
   it('should send error by not existing ID', async () => {
     const updatedCharecters = {name:'Lucka', surname:'Host'}
@@ -166,12 +179,12 @@ describe('adding to user homebar', () => {
     const errorReq = await request(app).patch(`/api${patchHomebar}${id}`).send({homebar:{coctail:''}})
     const responseGet = await request(app).get(`/api${userURL}${id}`)
     expect(responseGet.body[0].homebar).toStrictEqual([{coctail:'Pinokolada'}])
-    expect(errorReq.body).toBe('Invalid value')
+    expect(errorReq.body).toStrictEqual({"location": "body", "msg": "Invalid value", "param": "homebar.coctail", "value": ''})
   }),
   it('should send error by invalid ID', async () => {
-    const id = 'qwe'
-    const response = await request(app).patch(`/api${patchHomebar}${id}`).send({homebar:{coctail:'Pinokolada'}})
-    expect(response.body).toBe('Invalid value')
+    const errorId = 'qwe'
+    const response = await request(app).patch(`/api${patchHomebar}${errorId}`).send({homebar:{coctail:'Pinokolada'}})
+    expect(response.body).toStrictEqual({"location": "params", "msg": "Invalid value", "param": "id", "value": errorId})
   })
 })
 
@@ -199,11 +212,17 @@ describe('adding to user favorites', () => {
     const errorReq = await request(app).patch(`/api${patchFavorites}${id}`).send({favorites:{coctail:''}})
     const responseGet = await request(app).get(`/api${userURL}${id}`)
     expect(responseGet.body[0].favorites).toStrictEqual([{coctail:'Pinokolada'}])
-    expect(errorReq.body).toBe('Invalid value')
+    expect(errorReq.body).toStrictEqual({"location": "body",
+                                         "msg": "Invalid value", 
+                                         "param": "favorites.coctail", 
+                                         "value": ""})
   }),
   it('should send error by invalid ID', async () => {
-    const id ='qwe'
-    const response = await request(app).patch(`/api${patchFavorites}${id}`).send({favorites:{coctail:'Pinokolada'}})
-    expect(response.body).toBe('Invalid value')
+    const errorId ='qwe'
+    const response = await request(app).patch(`/api${patchFavorites}${errorId}`).send({favorites:{coctail:'Pinokolada'}})
+    expect(response.body).toStrictEqual({"location": "params",
+                                         "msg": "Invalid value", 
+                                         "param": "id", 
+                                         "value": errorId})
   })
 })

@@ -84,6 +84,20 @@ var checkService = /** @class */ (function () {
             });
         });
     };
+    checkService.prototype.checkOfVerificationEmail = function (email) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function () {
+            var VerificationEmail;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0: return [4 /*yield*/, db_1["default"].query("SELECT isActivated FROM person WHERE email = $1", [email])];
+                    case 1:
+                        VerificationEmail = _b.sent();
+                        return [2 /*return*/, (_a = VerificationEmail.rows[0]) === null || _a === void 0 ? void 0 : _a.isactivated];
+                }
+            });
+        });
+    };
     return checkService;
 }());
 exports["default"] = new checkService();

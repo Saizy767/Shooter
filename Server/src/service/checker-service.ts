@@ -13,6 +13,10 @@ class checkService{
         const codeAuth = await bd.query(`SELECT id FROM person WHERE id = $1`, [id])
         return Number(id) === codeAuth.rows[0]?.id ? true : false
     }
+    async checkOfVerificationEmail(email:string){
+        const VerificationEmail = await bd.query(`SELECT isActivated FROM person WHERE email = $1`,[email])
+        return VerificationEmail.rows[0]?.isactivated as boolean
+    }
 }
 
 export default new checkService()

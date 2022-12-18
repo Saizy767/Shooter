@@ -116,7 +116,7 @@ var UserController = /** @class */ (function () {
                     case 0:
                         error = express_validator_1.validationResult(req);
                         if (error.errors.length) {
-                            return [2 /*return*/, res.status(400).json(error.errors[0].msg)];
+                            return [2 /*return*/, res.status(400).json(error.errors[0])];
                         }
                         id = req.params.id;
                         return [4 /*yield*/, checker_service_1["default"].checkID({ id: id })];
@@ -144,7 +144,7 @@ var UserController = /** @class */ (function () {
                     case 0:
                         error = express_validator_1.validationResult(req);
                         if (error.errors.length) {
-                            return [2 /*return*/, res.status(400).json(error.errors[0].msg)];
+                            return [2 /*return*/, res.status(400).json(error.errors[0])];
                         }
                         id = req.params.id;
                         _a = req.body, name = _a.name, surname = _a.surname;
@@ -173,7 +173,7 @@ var UserController = /** @class */ (function () {
                     case 0:
                         error = express_validator_1.validationResult(req);
                         if (error.errors.length) {
-                            return [2 /*return*/, res.status(400).json(error.errors[0].msg)];
+                            return [2 /*return*/, res.status(400).json(error.errors[0])];
                         }
                         id = req.params.id;
                         homebar = req.body.homebar;
@@ -207,7 +207,7 @@ var UserController = /** @class */ (function () {
                     case 0:
                         error = express_validator_1.validationResult(req);
                         if (error.errors.length) {
-                            return [2 /*return*/, res.status(400).json(error.errors[0].msg)];
+                            return [2 /*return*/, res.status(400).json(error.errors[0])];
                         }
                         id = req.params.id;
                         favorites = req.body.favorites;

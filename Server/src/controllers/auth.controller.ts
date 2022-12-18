@@ -12,13 +12,14 @@ import { ErrorVal, UserTypeDB } from '../models/user-modules';
 import UserDTO from '../dtos/userDTO';
 import bd from '../database/db'
 
+
 dotenv.config()
 
 class AuthController{
     async registrate(req: Request,res: Response){
         const error = validationResult(req) as unknown as ErrorVal
         if(error.errors.length){
-            return res.status(400).json(error.errors[0].msg)
+            return res.status(400).json(error.errors[0])
         }
         const {name, surname, email, password}:{name:string,
             surname: string,
@@ -27,7 +28,8 @@ class AuthController{
         const securePassword = bscript.hashSync(password, 6)
         const activationCode = Math.floor(Math.random() * 999999).toString()
         const checkerEmail = await checkService.checkEmail(email)
-        if(checkerEmail){ // email and isActivated should be true
+        const VerificationEmail = await checkService.checkOfVerificationEmail(email)
+        if(checkerEmail && !VerificationEmail){ // email and isActivated should be true
             await bd.query(
                 `INSERT INTO person (name, surname, email,
                                     password, favorites, homebar, 
@@ -35,7 +37,10 @@ class AuthController{
                 VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
                 [name, surname, email, securePassword, [], [], false, false, activationCode])
             
-            res.status(201).json({message:'Account created'})
+            res.status(201).json('Account created')
+        }
+        else if(checkerEmail && VerificationEmail){
+            res.status(400).json('Account has verification')
         }
         else{
             await bd.query(
@@ -43,7 +48,7 @@ class AuthController{
                                     password=$3, favorites=$4, homebar=$5, 
                                     isActivated=$6,tokenActivated=$7, activatedCode=$8 WHERE email= $9`,
                 [name, surname, securePassword, [], [], false, false, activationCode, email])
-            res.status(200).json({message:'Account updated'})
+            res.status(200).json('Account updated')
         }
         if (process.env.NODE_ENV !== 'test') {
             await mailService.sendToEmail(email, activationCode)
@@ -52,7 +57,7 @@ class AuthController{
     async login(req:Request, res: Response){
         const error = validationResult(req) as unknown as ErrorVal
         if(error.errors.length){
-            return res.status(400).json(error.errors[0].msg)
+            return res.status(400).json(error.errors[0])
         }
         const {email , password}:{email:string, password:string} = req.body
         const user: UserTypeDB = await (await bd.query(`SELECT * FROM person WHERE email = $1`,[email])).rows[0]
@@ -70,7 +75,7 @@ class AuthController{
             return res.status(401).json('Authorization error')
         }
         if(!(user.isactivated)){
-            return res.status(401).json('Activation email')
+            return res.status(401).json('Activate code by your email')
         }
         const token = await tokenService.generateTokens({...userDTO})
 
@@ -80,10 +85,12 @@ class AuthController{
     async sendAuthCode(req: Request, res: Response){
         const error = validationResult(req) as unknown as ErrorVal
         if(error.errors.length){
-            return res.status(400).json(error.errors[0].msg)
+            return res.status(400).json(error.errors[0])
         }
+
         const {code, email}:{code:string, email:string} = req.body
         const CompareCode = await checkService.checkCode({email, code})
+
         if (CompareCode){
             await bd.query(`UPDATE person SET isActivated = $1, tokenActivated = $2 WHERE email = $3`,[true, true, email])
             res.status(200).json('Authorization code updated')
@@ -92,10 +99,11 @@ class AuthController{
             res.status(400).json('Authorization code error')
         }
     }
+
     async sendMail(req: Request, res: Response){
         const error = validationResult(req) as unknown as ErrorVal
         if(error.errors.length){
-            return res.status(400).json(error.errors[0].msg)
+            return res.status(400).json(error.errors[0])
         }
         const {email} = req.body
         const activationCode = Math.floor(Math.random() * 999999).toString()
@@ -108,7 +116,7 @@ class AuthController{
     async getEmail(req:Request, res: Response ){
         const error = validationResult(req) as unknown as ErrorVal
         if(error.errors.length){
-            return res.status(400).json(error.errors[0].msg)
+            return res.status(400).json(error.errors[0])
         }
         const email = req.params.email
         const checkEmail = await checkService.checkEmail(email)

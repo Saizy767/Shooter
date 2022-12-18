@@ -61,13 +61,13 @@ var AuthController = /** @class */ (function () {
     }
     AuthController.prototype.registrate = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var error, _a, name, surname, email, password, securePassword, activationCode, checkerEmail;
+            var error, _a, name, surname, email, password, securePassword, activationCode, checkerEmail, VerificationEmail;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
                         error = express_validator_1.validationResult(req);
                         if (error.errors.length) {
-                            return [2 /*return*/, res.status(400).json(error.errors[0].msg)];
+                            return [2 /*return*/, res.status(400).json(error.errors[0])];
                         }
                         _a = req.body, name = _a.name, surname = _a.surname, email = _a.email, password = _a.password;
                         securePassword = bscript.hashSync(password, 6);
@@ -75,24 +75,31 @@ var AuthController = /** @class */ (function () {
                         return [4 /*yield*/, checker_service_1["default"].checkEmail(email)];
                     case 1:
                         checkerEmail = _b.sent();
-                        if (!checkerEmail) return [3 /*break*/, 3];
-                        return [4 /*yield*/, db_1["default"].query("INSERT INTO person (name, surname, email,\n                                    password, favorites, homebar, \n                                    isActivated,tokenActivated, activatedCode)\n                VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)", [name, surname, email, securePassword, [], [], false, false, activationCode])];
+                        return [4 /*yield*/, checker_service_1["default"].checkOfVerificationEmail(email)];
                     case 2:
+                        VerificationEmail = _b.sent();
+                        if (!(checkerEmail && !VerificationEmail)) return [3 /*break*/, 4];
+                        return [4 /*yield*/, db_1["default"].query("INSERT INTO person (name, surname, email,\n                                    password, favorites, homebar, \n                                    isActivated,tokenActivated, activatedCode)\n                VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)", [name, surname, email, securePassword, [], [], false, false, activationCode])];
+                    case 3:
                         _b.sent();
-                        res.status(201).json({ message: 'Account created' });
-                        return [3 /*break*/, 5];
-                    case 3: return [4 /*yield*/, db_1["default"].query("UPDATE person SET name=$1, surname=$2,\n                                    password=$3, favorites=$4, homebar=$5, \n                                    isActivated=$6,tokenActivated=$7, activatedCode=$8 WHERE email= $9", [name, surname, securePassword, [], [], false, false, activationCode, email])];
+                        res.status(201).json('Account created');
+                        return [3 /*break*/, 7];
                     case 4:
-                        _b.sent();
-                        res.status(200).json({ message: 'Account updated' });
-                        _b.label = 5;
-                    case 5:
-                        if (!(process.env.NODE_ENV !== 'test')) return [3 /*break*/, 7];
-                        return [4 /*yield*/, mail_service_1["default"].sendToEmail(email, activationCode)];
+                        if (!(checkerEmail && VerificationEmail)) return [3 /*break*/, 5];
+                        res.status(400).json('Account has verification');
+                        return [3 /*break*/, 7];
+                    case 5: return [4 /*yield*/, db_1["default"].query("UPDATE person SET name=$1, surname=$2,\n                                    password=$3, favorites=$4, homebar=$5, \n                                    isActivated=$6,tokenActivated=$7, activatedCode=$8 WHERE email= $9", [name, surname, securePassword, [], [], false, false, activationCode, email])];
                     case 6:
                         _b.sent();
+                        res.status(200).json('Account updated');
                         _b.label = 7;
-                    case 7: return [2 /*return*/];
+                    case 7:
+                        if (!(process.env.NODE_ENV !== 'test')) return [3 /*break*/, 9];
+                        return [4 /*yield*/, mail_service_1["default"].sendToEmail(email, activationCode)];
+                    case 8:
+                        _b.sent();
+                        _b.label = 9;
+                    case 9: return [2 /*return*/];
                 }
             });
         });
@@ -105,7 +112,7 @@ var AuthController = /** @class */ (function () {
                     case 0:
                         error = express_validator_1.validationResult(req);
                         if (error.errors.length) {
-                            return [2 /*return*/, res.status(400).json(error.errors[0].msg)];
+                            return [2 /*return*/, res.status(400).json(error.errors[0])];
                         }
                         _a = req.body, email = _a.email, password = _a.password;
                         return [4 /*yield*/, db_1["default"].query("SELECT * FROM person WHERE email = $1", [email])];
@@ -128,7 +135,7 @@ var AuthController = /** @class */ (function () {
                             return [2 /*return*/, res.status(401).json('Authorization error')];
                         }
                         if (!(user.isactivated)) {
-                            return [2 /*return*/, res.status(401).json('Activation email')];
+                            return [2 /*return*/, res.status(401).json('Activate code by your email')];
                         }
                         return [4 /*yield*/, token_service_1["default"].generateTokens(__assign({}, userDTO))];
                     case 4:
@@ -148,7 +155,7 @@ var AuthController = /** @class */ (function () {
                     case 0:
                         error = express_validator_1.validationResult(req);
                         if (error.errors.length) {
-                            return [2 /*return*/, res.status(400).json(error.errors[0].msg)];
+                            return [2 /*return*/, res.status(400).json(error.errors[0])];
                         }
                         _a = req.body, code = _a.code, email = _a.email;
                         return [4 /*yield*/, checker_service_1["default"].checkCode({ email: email, code: code })];
@@ -176,7 +183,7 @@ var AuthController = /** @class */ (function () {
                     case 0:
                         error = express_validator_1.validationResult(req);
                         if (error.errors.length) {
-                            return [2 /*return*/, res.status(400).json(error.errors[0].msg)];
+                            return [2 /*return*/, res.status(400).json(error.errors[0])];
                         }
                         email = req.body.email;
                         activationCode = Math.floor(Math.random() * 999999).toString();
@@ -203,7 +210,7 @@ var AuthController = /** @class */ (function () {
                     case 0:
                         error = express_validator_1.validationResult(req);
                         if (error.errors.length) {
-                            return [2 /*return*/, res.status(400).json(error.errors[0].msg)];
+                            return [2 /*return*/, res.status(400).json(error.errors[0])];
                         }
                         email = req.params.email;
                         return [4 /*yield*/, checker_service_1["default"].checkEmail(email)];

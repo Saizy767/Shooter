@@ -19,7 +19,7 @@ describe('registration',() => {
     })
     afterEach( async () => {
       jest.clearAllMocks();
-      await testPool.query('DROP TABLE person;')
+      await testPool.query('DROP TABLE IF EXISTS person;')
     });
   it('should response Account created and updated', async () => {
       const user = { name:'Mike', surname:'Dark' , email: 'qwerty@gmail.com', password: 'qwerty'};
@@ -33,8 +33,9 @@ describe('registration',() => {
                            .send(newUser)
                            .then((data)=>{return data.body})
       const responseGet = await request(app).get('/api'+ userURL)
+      
 
-      expect(response.message).toBe('Account created');
+      expect(response).toBe('Account created');
       expect(responseGet.body[0]).toMatchObject({
           "email": newUser.email,
           "name": newUser.name,
@@ -42,27 +43,27 @@ describe('registration',() => {
           "surname": newUser.surname,
           "isactivated": false
       })
-      expect(repeat.message).toBe('Account updated');
+      expect(repeat).toBe('Account updated');
   })
   it('should response name empty', async () => {
       const user = { name:'' , surname:'Dark' , email: 'qwerty@gmail.com', password: 'qwerty'};
       const response = await request(app).post("/api" + authRegistration).send(user);
-      expect(response.body).toBe('Invalid value')
+      expect(response.body).toStrictEqual({"location": "body", "msg": "Invalid value", "param": "name", "value": user.name})
   })
   it('should response surname empty', async () => {
       const user = { name:'Mike' , surname:'' , email: 'qwerty@gmail.com', password: 'qwerty'};
       const response = await request(app).post("/api" + authRegistration).send(user);
-      expect(response.body).toBe('Invalid value')
+      expect(response.body).toStrictEqual({"location": "body", "msg": "Invalid value", "param": "surname", "value": user.surname})
   })
   it('should response email empty', async () => {
       const user = { name:'Mike' , surname:'Dark' , email: '', password: 'qwerty'};
       const response = await request(app).post("/api" + authRegistration).send(user);
-      expect(response.body).toBe('Invalid value')
+      expect(response.body).toStrictEqual({"location": "body", "msg": "Invalid value", "param": "email", "value": user.email})
   })
   it('should response password empty', async () => {
       const user = { name:'Mike' , surname:'Dark' , email: 'qwerty@gmail.com', password: ''};
       const response = await request(app).post("/api" + authRegistration).send(user);
-      expect(response.body).toBe('Invalid value')
+      expect(response.body).toStrictEqual({"location": "body", "msg": "Invalid value", "param": "password", "value": user.password})
   })
 })
 
@@ -90,15 +91,17 @@ describe('login user', () => {
     })
     it('should return error by not activated email', async () => {
       const response = await request(app).post('/api' + authLogin).send({email: user.email, password:user.password})
-      expect(response.body).toBe('Activation email')
+      expect(response.body).toBe('Activate code by your email')
     })
     it('should return error by invalid email', async () => {
-      const response = await request(app).post('/api' + authLogin).send({email: 'asd', password:user.password})
-      expect(response.body).toBe('Invalid value')
+      const loginUser = {email: 'asd', password:user.password}
+      const response = await request(app).post('/api' + authLogin).send(loginUser)
+      expect(response.body).toStrictEqual({"location": "body", "msg": "Invalid value", "param": "email", "value": loginUser.email})
     })
     it('should return error by invalid password', async () => {
-      const response = await request(app).post('/api' + authLogin).send({email: user.email, password:'1234'})
-      expect(response.body).toBe('Invalid value')
+      const loginUser = {email: user.email, password:'1234'}
+      const response = await request(app).post('/api' + authLogin).send(loginUser)
+      expect(response.body).toStrictEqual({"location": "body", "msg": "Invalid value", "param": "password", "value": loginUser.password})
     })
 })
 
@@ -148,16 +151,18 @@ describe('send Authorization Code', () => {
     expect(response.tokenactivated).toBeFalsy()
   }),
   it('should return Authorization code error of empty email', async () =>{
+    const userCode = {email:'', code:'123456'}
     const response = await request(app)
                            .patch('/api' + authCode)
-                           .send({email:'', code:'123456'})
-    expect(response.body).toBe('Invalid value')
+                           .send(userCode)
+    expect(response.body).toStrictEqual({"location": "body", "msg": "Invalid value", "param": "email", "value": userCode.email})
   }),
   it('should return Authorization code error of empty code', async () =>{
+    const userCode = {email:user.email, code:''}
     const response = await request(app)
                            .patch('/api' + authCode)
                            .send({email:user.email, code:''})
-    expect(response.body).toBe('Invalid value')
+    expect(response.body).toStrictEqual({"location": "body", "msg": "Invalid value", "param": "code", "value": userCode.code})
   })
 })
 
@@ -178,8 +183,9 @@ describe('send to email', () => {
     expect(response.body).toBe(`Send to ${user.email}`)
   })
   it('should return error of invalid email', async () => {
-    const response = await request(app).post('/api' + authSendToMail).send({email:'12'})
-    expect(response.body).toBe(`Invalid value`)
+    const email = 12
+    const response = await request(app).post('/api' + authSendToMail).send({email})
+    expect(response.body).toStrictEqual({"location": "body", "msg": "Invalid value", "param": "email", "value": email})
   })
 })
 
@@ -206,6 +212,6 @@ describe('send email for check of existing', () => {
   it('should return error of invalid email', async () => {
     const email = 'qwerqwas@sadas'
     const response = await request(app).get(`/api${authGetMail}${email}`)
-    expect(response.body).toBe(`Invalid value`)
+    expect(response.body).toStrictEqual({"location": "params", "msg": "Invalid value", "param": "email", "value": email})
   })
 })

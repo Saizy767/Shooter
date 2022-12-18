@@ -52,6 +52,7 @@ var testPool = new pg_1.Pool({
 describe('checker service', function () {
     var user;
     beforeEach(function () { return __awaiter(void 0, void 0, void 0, function () {
+        var getUser;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, testPool.query(user_schema_1.DataQuery)];
@@ -60,6 +61,12 @@ describe('checker service', function () {
                     user = { name: 'Mike', surname: 'Dark', email: 'qwerty@gmail.com', password: 'qwertyqwert' };
                     return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api/' + auth_href_1.authRegistration).send(user)];
                 case 2:
+                    _a.sent();
+                    return [4 /*yield*/, supertest_1["default"](index_1.app).get("/api" + user_href_1.userURL + "1")];
+                case 3:
+                    getUser = _a.sent();
+                    return [4 /*yield*/, supertest_1["default"](index_1.app).patch("/api" + auth_href_1.authCode).send({ code: getUser.body[0].activatedcode, email: user.email })];
+                case 4:
                     _a.sent();
                     return [2 /*return*/];
             }
@@ -70,14 +77,14 @@ describe('checker service', function () {
             switch (_a.label) {
                 case 0:
                     jest.clearAllMocks();
-                    return [4 /*yield*/, testPool.query('DROP TABLE person')];
+                    return [4 /*yield*/, testPool.query('DROP TABLE IF EXISTS person')];
                 case 1:
                     _a.sent();
                     return [2 /*return*/];
             }
         });
     }); });
-    it('checker-email should return true', function () { return __awaiter(void 0, void 0, void 0, function () {
+    test('checker-email should return true', function () { return __awaiter(void 0, void 0, void 0, function () {
         var emailCheck;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -89,7 +96,7 @@ describe('checker service', function () {
             }
         });
     }); }),
-        it('checker-email should return false', function () { return __awaiter(void 0, void 0, void 0, function () {
+        test('checker-email should return false', function () { return __awaiter(void 0, void 0, void 0, function () {
             var emailCheck;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -101,7 +108,7 @@ describe('checker service', function () {
                 }
             });
         }); }),
-        it('checker-code should return false', function () { return __awaiter(void 0, void 0, void 0, function () {
+        test('checker-code should return false', function () { return __awaiter(void 0, void 0, void 0, function () {
             var emailCheck;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -113,7 +120,7 @@ describe('checker service', function () {
                 }
             });
         }); }),
-        it('checker-code should return true', function () { return __awaiter(void 0, void 0, void 0, function () {
+        test('checker-code should return true', function () { return __awaiter(void 0, void 0, void 0, function () {
             var getUser, emailCheck;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -128,7 +135,7 @@ describe('checker service', function () {
                 }
             });
         }); }),
-        it('checker-id should return true', function () { return __awaiter(void 0, void 0, void 0, function () {
+        test('checker-id should return true', function () { return __awaiter(void 0, void 0, void 0, function () {
             var IDCheck;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -140,7 +147,7 @@ describe('checker service', function () {
                 }
             });
         }); });
-    it('checker-id should return false', function () { return __awaiter(void 0, void 0, void 0, function () {
+    test('checker-id should return false', function () { return __awaiter(void 0, void 0, void 0, function () {
         var IDCheck;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -148,6 +155,38 @@ describe('checker service', function () {
                 case 1:
                     IDCheck = _a.sent();
                     expect(IDCheck).toBeFalsy();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    test('checker-VerificationEmail should return true', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var VerificationCheck;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, checker_service_1["default"].checkOfVerificationEmail(user.email)];
+                case 1:
+                    VerificationCheck = _a.sent();
+                    expect(VerificationCheck).toBeTruthy();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    test('checker-VerificationEmail should return false', function () { return __awaiter(void 0, void 0, void 0, function () {
+        var secUser, getUser, VerificationCheck;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    secUser = { name: 'lika', surname: 'fonk', email: 'qwertyssa@gmail.com', password: 'qwertyqwert' };
+                    return [4 /*yield*/, supertest_1["default"](index_1.app).post('/api/' + auth_href_1.authRegistration).send(secUser)];
+                case 1:
+                    _a.sent();
+                    return [4 /*yield*/, supertest_1["default"](index_1.app).get("/api" + user_href_1.userURL + "2")];
+                case 2:
+                    getUser = _a.sent();
+                    return [4 /*yield*/, checker_service_1["default"].checkOfVerificationEmail(getUser.body.email)];
+                case 3:
+                    VerificationCheck = _a.sent();
+                    expect(VerificationCheck).toBeFalsy();
                     return [2 /*return*/];
             }
         });

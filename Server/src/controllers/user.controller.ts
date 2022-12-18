@@ -3,7 +3,6 @@ import * as jwt from 'jsonwebtoken';
 import * as dotenv from 'dotenv'
 import {validationResult} from 'express-validator'
 
-import mailService from '../service/mail-service';
 import checkService from '../service/checker-service';
 
 import { ErrorVal } from '../models/user-modules';
@@ -50,7 +49,7 @@ class UserController{
     async getOneUser(req: Request,res: Response){
         const error = validationResult(req) as unknown as ErrorVal
         if(error.errors.length){
-            return res.status(400).json(error.errors[0].msg)
+            return res.status(400).json(error.errors[0])
         }
         const id = req.params.id
 
@@ -67,7 +66,7 @@ class UserController{
     async updateUser(req: Request,res: Response){
         const error = validationResult(req) as unknown as ErrorVal
         if(error.errors.length){
-            return res.status(400).json(error.errors[0].msg)
+            return res.status(400).json(error.errors[0])
         }
         const id = req.params.id
         const {name, surname}:{name:string, surname: string} = req.body
@@ -87,7 +86,7 @@ class UserController{
         const error = validationResult(req) as unknown as ErrorVal
 
         if(error.errors.length){
-            return res.status(400).json(error.errors[0].msg)
+            return res.status(400).json(error.errors[0])
         }
         const id = req.params.id
         const {homebar} = req.body
@@ -113,7 +112,7 @@ class UserController{
         const error = validationResult(req) as unknown as ErrorVal
 
         if(error.errors.length){
-            return res.status(400).json(error.errors[0].msg)
+            return res.status(400).json(error.errors[0])
         }
         const id = req.params.id
         const {favorites} = req.body

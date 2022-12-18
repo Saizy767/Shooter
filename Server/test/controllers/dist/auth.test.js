@@ -64,7 +64,7 @@ describe('registration', function () {
             switch (_a.label) {
                 case 0:
                     jest.clearAllMocks();
-                    return [4 /*yield*/, testPool.query('DROP TABLE person;')];
+                    return [4 /*yield*/, testPool.query('DROP TABLE IF EXISTS person;')];
                 case 1:
                     _a.sent();
                     return [2 /*return*/];
@@ -93,7 +93,7 @@ describe('registration', function () {
                     return [4 /*yield*/, supertest_1["default"](index_ts_1.app).get('/api' + user_href_1.userURL)];
                 case 3:
                     responseGet = _a.sent();
-                    expect(response.message).toBe('Account created');
+                    expect(response).toBe('Account created');
                     expect(responseGet.body[0]).toMatchObject({
                         "email": newUser.email,
                         "name": newUser.name,
@@ -101,7 +101,7 @@ describe('registration', function () {
                         "surname": newUser.surname,
                         "isactivated": false
                     });
-                    expect(repeat.message).toBe('Account updated');
+                    expect(repeat).toBe('Account updated');
                     return [2 /*return*/];
             }
         });
@@ -115,7 +115,7 @@ describe('registration', function () {
                     return [4 /*yield*/, supertest_1["default"](index_ts_1.app).post("/api" + auth_href_1.authRegistration).send(user)];
                 case 1:
                     response = _a.sent();
-                    expect(response.body).toBe('Invalid value');
+                    expect(response.body).toStrictEqual({ "location": "body", "msg": "Invalid value", "param": "name", "value": user.name });
                     return [2 /*return*/];
             }
         });
@@ -129,7 +129,7 @@ describe('registration', function () {
                     return [4 /*yield*/, supertest_1["default"](index_ts_1.app).post("/api" + auth_href_1.authRegistration).send(user)];
                 case 1:
                     response = _a.sent();
-                    expect(response.body).toBe('Invalid value');
+                    expect(response.body).toStrictEqual({ "location": "body", "msg": "Invalid value", "param": "surname", "value": user.surname });
                     return [2 /*return*/];
             }
         });
@@ -143,7 +143,7 @@ describe('registration', function () {
                     return [4 /*yield*/, supertest_1["default"](index_ts_1.app).post("/api" + auth_href_1.authRegistration).send(user)];
                 case 1:
                     response = _a.sent();
-                    expect(response.body).toBe('Invalid value');
+                    expect(response.body).toStrictEqual({ "location": "body", "msg": "Invalid value", "param": "email", "value": user.email });
                     return [2 /*return*/];
             }
         });
@@ -157,7 +157,7 @@ describe('registration', function () {
                     return [4 /*yield*/, supertest_1["default"](index_ts_1.app).post("/api" + auth_href_1.authRegistration).send(user)];
                 case 1:
                     response = _a.sent();
-                    expect(response.body).toBe('Invalid value');
+                    expect(response.body).toStrictEqual({ "location": "body", "msg": "Invalid value", "param": "password", "value": user.password });
                     return [2 /*return*/];
             }
         });
@@ -226,31 +226,35 @@ describe('login user', function () {
                 case 0: return [4 /*yield*/, supertest_1["default"](index_ts_1.app).post('/api' + auth_href_1.authLogin).send({ email: user.email, password: user.password })];
                 case 1:
                     response = _a.sent();
-                    expect(response.body).toBe('Activation email');
+                    expect(response.body).toBe('Activate code by your email');
                     return [2 /*return*/];
             }
         });
     }); });
     it('should return error by invalid email', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var response;
+        var loginUser, response;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, supertest_1["default"](index_ts_1.app).post('/api' + auth_href_1.authLogin).send({ email: 'asd', password: user.password })];
+                case 0:
+                    loginUser = { email: 'asd', password: user.password };
+                    return [4 /*yield*/, supertest_1["default"](index_ts_1.app).post('/api' + auth_href_1.authLogin).send(loginUser)];
                 case 1:
                     response = _a.sent();
-                    expect(response.body).toBe('Invalid value');
+                    expect(response.body).toStrictEqual({ "location": "body", "msg": "Invalid value", "param": "email", "value": loginUser.email });
                     return [2 /*return*/];
             }
         });
     }); });
     it('should return error by invalid password', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var response;
+        var loginUser, response;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, supertest_1["default"](index_ts_1.app).post('/api' + auth_href_1.authLogin).send({ email: user.email, password: '1234' })];
+                case 0:
+                    loginUser = { email: user.email, password: '1234' };
+                    return [4 /*yield*/, supertest_1["default"](index_ts_1.app).post('/api' + auth_href_1.authLogin).send(loginUser)];
                 case 1:
                     response = _a.sent();
-                    expect(response.body).toBe('Invalid value');
+                    expect(response.body).toStrictEqual({ "location": "body", "msg": "Invalid value", "param": "password", "value": loginUser.password });
                     return [2 /*return*/];
             }
         });
@@ -367,29 +371,33 @@ describe('send Authorization Code', function () {
             });
         }); }),
         it('should return Authorization code error of empty email', function () { return __awaiter(void 0, void 0, void 0, function () {
-            var response;
+            var userCode, response;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, supertest_1["default"](index_ts_1.app)
-                            .patch('/api' + auth_href_1.authCode)
-                            .send({ email: '', code: '123456' })];
+                    case 0:
+                        userCode = { email: '', code: '123456' };
+                        return [4 /*yield*/, supertest_1["default"](index_ts_1.app)
+                                .patch('/api' + auth_href_1.authCode)
+                                .send(userCode)];
                     case 1:
                         response = _a.sent();
-                        expect(response.body).toBe('Invalid value');
+                        expect(response.body).toStrictEqual({ "location": "body", "msg": "Invalid value", "param": "email", "value": userCode.email });
                         return [2 /*return*/];
                 }
             });
         }); }),
         it('should return Authorization code error of empty code', function () { return __awaiter(void 0, void 0, void 0, function () {
-            var response;
+            var userCode, response;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, supertest_1["default"](index_ts_1.app)
-                            .patch('/api' + auth_href_1.authCode)
-                            .send({ email: user.email, code: '' })];
+                    case 0:
+                        userCode = { email: user.email, code: '' };
+                        return [4 /*yield*/, supertest_1["default"](index_ts_1.app)
+                                .patch('/api' + auth_href_1.authCode)
+                                .send({ email: user.email, code: '' })];
                     case 1:
                         response = _a.sent();
-                        expect(response.body).toBe('Invalid value');
+                        expect(response.body).toStrictEqual({ "location": "body", "msg": "Invalid value", "param": "code", "value": userCode.code });
                         return [2 /*return*/];
                 }
             });
@@ -437,13 +445,15 @@ describe('send to email', function () {
         });
     }); });
     it('should return error of invalid email', function () { return __awaiter(void 0, void 0, void 0, function () {
-        var response;
+        var email, response;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, supertest_1["default"](index_ts_1.app).post('/api' + auth_href_1.authSendToMail).send({ email: '12' })];
+                case 0:
+                    email = 12;
+                    return [4 /*yield*/, supertest_1["default"](index_ts_1.app).post('/api' + auth_href_1.authSendToMail).send({ email: email })];
                 case 1:
                     response = _a.sent();
-                    expect(response.body).toBe("Invalid value");
+                    expect(response.body).toStrictEqual({ "location": "body", "msg": "Invalid value", "param": "email", "value": email });
                     return [2 /*return*/];
             }
         });
@@ -512,7 +522,7 @@ describe('send email for check of existing', function () {
                         return [4 /*yield*/, supertest_1["default"](index_ts_1.app).get("/api" + auth_href_1.authGetMail + email)];
                     case 1:
                         response = _a.sent();
-                        expect(response.body).toBe("Invalid value");
+                        expect(response.body).toStrictEqual({ "location": "params", "msg": "Invalid value", "param": "email", "value": email });
                         return [2 /*return*/];
                 }
             });
